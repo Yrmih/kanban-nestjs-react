@@ -1,6 +1,10 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
-export type TaskStatus = 'pending' | 'in-progress' | 'done';
+export enum TaskStatus {
+  PENDING = 'pending',
+  IN_PROGRESS = 'in-progress',
+  DONE = 'done',
+}
 
 @Entity('tasks')
 export class Task {
@@ -13,6 +17,6 @@ export class Task {
   @Column({ nullable: true })
   description?: string;
 
-  @Column({ type: 'varchar', default: 'pending' })
+  @Column({ type: 'enum', enum: TaskStatus, default: TaskStatus.PENDING })
   status: TaskStatus;
 }

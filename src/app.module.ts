@@ -1,20 +1,20 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
-// Importando o ConfigModule
-import { ConfigModule } from '@nestjs/config';
-import { ConfigService } from '@nestjs/config';
-// Importando o módulo de tarefas
+import { ConfigModule, ConfigService } from '@nestjs/config';
+
+// Importando o módulo de tarefas e a entidade Task
 import { TasksModule } from './tasks/tasks.module';
+import { Task } from './tasks/entities/task.entity';
 
 @Module({
   imports: [
-    // Usando o ConfigModule
+    // Configurações globais do .env
     ConfigModule.forRoot({
-      isGlobal: true, // Torna as variáveis acessíveis globalmente
-      envFilePath: '.env', // Local do arquivo .env
+      isGlobal: true,
+      envFilePath: '.env',
     }),
 
-    // Configurando o TypeORM com a URL do banco de dados da variável de ambiente
+    // Configurando o TypeORM com o banco de dados PostgreSQL
     TypeOrmModule.forRootAsync({
       useFactory: (configService: ConfigService): TypeOrmModuleOptions => {
         const dbUrl = configService.get<string>('DATABASE_URL');
@@ -22,16 +22,15 @@ import { TasksModule } from './tasks/tasks.module';
 
         return {
           type: 'postgres',
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           url: dbUrl,
-          entities: [],
-          synchronize: true,
+          entities: [Task], // <-- Aqui adicionei a entidade Task
+          synchronize: true, // Não usar em produção!
         };
       },
       inject: [ConfigService],
     }),
+
     TasksModule,
   ],
-  providers: [ConfigService],
 })
 export class AppModule {}
