@@ -4,7 +4,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 
 // Importando o módulo de tarefas e a entidade Task
 import { TasksModule } from './tasks/tasks.module';
-import { Task } from './tasks/entities/task.entity';
 
 @Module({
   imports: [
@@ -23,7 +22,6 @@ import { Task } from './tasks/entities/task.entity';
         return {
           type: 'postgres',
           url: dbUrl,
-          entities: [Task], // <-- Aqui adicionei a entidade Task
           autoLoadEntities: true,
           synchronize: true, // Não usar em produção!
         };

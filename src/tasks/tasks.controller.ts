@@ -41,7 +41,10 @@ export class TasksController {
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    return this.tasksService.remove(id);
+  async remove(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<{ message: string }> {
+    await this.tasksService.remove(id);
+    return { message: `Task #${id} deleted successfully.` };
   }
 }
