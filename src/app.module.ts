@@ -24,6 +24,7 @@ import { Task } from './tasks/entities/task.entity';
           type: 'postgres',
           url: dbUrl,
           entities: [Task], // <-- Aqui adicionei a entidade Task
+          autoLoadEntities: true,
           synchronize: true, // Não usar em produção!
         };
       },
