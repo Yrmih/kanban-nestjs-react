@@ -28,8 +28,8 @@ export class TasksController {
   }
 
   @Post()
-  create(@Body() taskData: CreateTaskDto): Promise<Task> {
-    return this.tasksService.create(taskData);
+  create(@Body() dto: CreateTaskDto) {
+    return this.tasksService.create(dto);
   }
 
   @Put(':id')

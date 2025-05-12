@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column as ColumnDecorator,
+  ManyToOne,
+} from 'typeorm';
+import { ColumnEntity } from 'src/columns/column.entity'; // Importando a entidade Column
 
 export enum TaskStatus {
   PENDING = 'pending',
@@ -11,12 +17,22 @@ export class Task {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 100 })
+  @ColumnDecorator({ length: 100 })
   title: string;
 
-  @Column({ nullable: true })
+  @ColumnDecorator({ nullable: true })
   description?: string;
 
-  @Column({ type: 'enum', enum: TaskStatus, default: TaskStatus.PENDING })
+  @ColumnDecorator({
+    type: 'enum',
+    enum: TaskStatus,
+    default: TaskStatus.PENDING,
+  })
   status: TaskStatus;
+
+  @ManyToOne(() => ColumnEntity, (column) => column.tasks, {
+    onDelete: 'CASCADE',
+    eager: true, // opcional: carrega automaticamente a coluna relacionada
+  })
+  column: ColumnEntity;
 }

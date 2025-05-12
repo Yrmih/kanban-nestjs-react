@@ -1,0 +1,24 @@
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  OneToMany,
+} from 'typeorm';
+import { User } from 'src/users/user.entity';
+import { Column as ColumnEntity } from '@/columns/column.entity';
+
+@Entity('boards')
+export class Board {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column()
+  name: string;
+
+  @ManyToOne(() => User, user => user.boards, { onDelete: 'CASCADE' })
+  user: User;
+
+  @OneToMany(() => ColumnEntity, column => column.board, { cascade: true })
+  columns: ColumnEntity[];
+}

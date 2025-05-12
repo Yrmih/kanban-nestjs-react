@@ -1,6 +1,20 @@
-// tasks/dto/update-task.dto.ts
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateTaskDto } from './create-task.dto';
+import { IsOptional, IsString, IsIn, IsUUID } from 'class-validator';
+import { TaskStatus } from '../entities/task.entity';
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-call
-export class UpdateTaskDto extends PartialType(CreateTaskDto) {}
+export class UpdateTaskDto {
+  @IsOptional()
+  @IsString()
+  title?: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @IsOptional()
+  @IsIn([TaskStatus.PENDING, TaskStatus.IN_PROGRESS, TaskStatus.DONE])
+  status?: TaskStatus;
+
+  @IsOptional()
+  @IsUUID()
+  columnId?: string;
+}

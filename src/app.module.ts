@@ -1,12 +1,16 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-
+import { UsersModule } from './users/users.module';
+import { BoardsModule } from './boards/boards.module';
 // Importando o módulo de tarefas e a entidade Task
 import { TasksModule } from './tasks/tasks.module';
 
 @Module({
   imports: [
+    TasksModule,
+    BoardsModule,
+    UsersModule,
     // Configurações globais do .env
     ConfigModule.forRoot({
       isGlobal: true,
