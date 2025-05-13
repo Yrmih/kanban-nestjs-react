@@ -5,6 +5,7 @@ import {
   ManyToOne,
 } from 'typeorm';
 import { ColumnEntity } from 'src/columns/column.entity'; // Importando a entidade Column
+import { User } from 'src/users/users.entity';
 
 export enum TaskStatus {
   PENDING = 'pending',
@@ -35,4 +36,10 @@ export class Task {
     eager: true, // opcional: carrega automaticamente a coluna relacionada
   })
   column: ColumnEntity;
+
+  @ManyToOne(() => User, (user) => user.tasks, {
+    onDelete: 'CASCADE',
+  })
+  user: User;
+  // opcional: carrega automaticamente o usuário relacionado
 }

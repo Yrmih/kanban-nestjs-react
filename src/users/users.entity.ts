@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { Board } from 'src/boards/board.entity'; // Ajuste o caminho se necessário
-
+import { Task } from 'src/tasks/entities/task.entity';
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
@@ -20,4 +20,7 @@ export class User {
 
   @OneToMany(() => Board, (board) => board.user)
   boards: Board[];
+
+  @OneToMany(() => Task, (task) => task.user)
+  tasks: Task[];
 }
