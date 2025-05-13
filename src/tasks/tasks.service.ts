@@ -1,9 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Task } from './entities/task.entity';
-import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Column } from 'src/columns/column.entity'; // Importar a entidade Column
-import { CreateTaskDto } from './dto/create-task.dto'; // O DTO que você ajustou
+import { Repository } from 'typeorm';
+
+import { Task } from './entities/task.entity';
+import { ColumnEntity } from 'src/columns/column.entity';
+import { CreateTaskDto } from './dto/create-task.dto';
+import { UpdateTaskDto } from './dto/update-task.dto'; // <-- crie esse se ainda não tiver
 
 @Injectable()
 export class TasksService {
@@ -11,18 +13,18 @@ export class TasksService {
     @InjectRepository(Task)
     private readonly taskRepository: Repository<Task>,
 
-    @InjectRepository(Column)
-    private readonly columnRepository: Repository<Column>, // Injetar o repositório da Column
+    @InjectRepository(ColumnEntity)
+    private readonly columnRepository: Repository<ColumnEntity>,
   ) {}
 
   async findAll(): Promise<Task[]> {
-    return this.taskRepository.find();
+    return this.taskRepository.find({ relations: ['column'] });
   }
 
   async findOne(id: number): Promise<Task> {
     const task = await this.taskRepository.findOne({
       where: { id },
-      relations: ['column'], // Garantir que a coluna associada à tarefa seja carregada
+      relations: ['column'],
     });
 
     if (!task) {
@@ -34,7 +36,7 @@ export class TasksService {
 
   async create(data: CreateTaskDto): Promise<Task> {
     const column = await this.columnRepository.findOne({
-      where: { id: data.columnId },
+      where: { id: String(data.columnId) },
     });
 
     if (!column) {
@@ -44,29 +46,31 @@ export class TasksService {
     const task = this.taskRepository.create({
       title: data.title,
       description: data.description,
-      status: data.status || 'pending',
-      column, // Relacionar a tarefa à coluna
+      status: data.status ?? 'pending',
+      column,
     });
 
     return this.taskRepository.save(task);
   }
 
-  async update(id: number, data: Partial<Task>): Promise<Task> {
+  async update(id: number, data: UpdateTaskDto): Promise<Task> {
     const task = await this.findOne(id);
 
     if (data.columnId) {
       const column = await this.columnRepository.findOne({
         where: { id: data.columnId },
       });
+
       if (!column) {
         throw new NotFoundException(`Column #${data.columnId} not found`);
       }
-      task.column = column; // Atualizar a coluna da tarefa
+
+      task.column = column;
     }
 
-    task.title = data.title || task.title;
-    task.description = data.description || task.description;
-    task.status = data.status || task.status;
+    task.title = data.title ?? task.title;
+    task.description = data.description ?? task.description;
+    task.status = data.status ?? task.status;
 
     return this.taskRepository.save(task);
   }

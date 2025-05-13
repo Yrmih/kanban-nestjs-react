@@ -1,18 +1,17 @@
-import { IsString, IsOptional, IsIn, IsInt } from 'class-validator';
-import { TaskStatus } from '../entities/task.entity';
+import { IsString, IsOptional, IsUUID } from 'class-validator';
 
 export class CreateTaskDto {
   @IsString()
   title: string;
 
+  @IsOptional()
   @IsString()
-  description: string;
+  description?: string;
 
   @IsOptional()
   @IsString()
-  @IsIn(['pending', 'in-progress', 'done'])
-  status?: TaskStatus;
+  status?: string;
 
-  @IsInt()
-  columnId: number;
+  @IsUUID()
+  columnId: string;
 }
