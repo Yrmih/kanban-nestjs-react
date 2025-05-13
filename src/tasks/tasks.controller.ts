@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Put,
+  Patch,
   Delete,
   Param,
   Body,
@@ -12,6 +13,7 @@ import { TasksService } from './tasks.service';
 import { Task } from './entities/task.entity';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { UpdateTaskStatusDto } from './dto/update-task-status.dto'; // novo import
 
 @Controller('tasks')
 export class TasksController {
@@ -40,6 +42,14 @@ export class TasksController {
     return this.tasksService.update(id, updateData);
   }
 
+  @Patch(':id/status')
+  async updateStatus(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: UpdateTaskStatusDto,
+  ): Promise<Task> {
+    const updated = await this.tasksService.updateStatus(id, body.status);
+    return updated;
+  }
   @Delete(':id')
   async remove(
     @Param('id', ParseIntPipe) id: number,
