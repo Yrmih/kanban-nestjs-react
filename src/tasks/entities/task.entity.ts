@@ -8,7 +8,7 @@ import { ColumnEntity } from 'src/columns/column.entity'; // Importando a entida
 
 export enum TaskStatus {
   PENDING = 'pending',
-  IN_PROGRESS = 'in-progress',
+  IN_PROGRESS = 'in_progress',
   DONE = 'done',
 }
 

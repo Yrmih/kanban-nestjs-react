@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { Board } from '@/boards/board.entity'; // Ajuste o caminho se necessário
+import { Board } from 'src/boards/board.entity'; // Ajuste o caminho se necessário
 
 @Entity('users')
 export class User {

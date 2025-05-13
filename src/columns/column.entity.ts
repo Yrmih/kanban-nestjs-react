@@ -5,7 +5,6 @@ import {
   ManyToOne,
   OneToMany,
 } from 'typeorm';
-import { Board } from 'src/boards/board.entity';
 import { Task } from 'src/tasks/entities/task.entity';
 
 @Entity('columns')
@@ -16,9 +15,10 @@ export class ColumnEntity {
   @ColumnDecorator()
   name: string;
 
-  @ManyToOne(() => ColumnEntity, (column) => column.board)
+  @ManyToOne(() => ColumnEntity, (column) => column)
   columns: ColumnEntity[];
 
   @OneToMany(() => Task, (task) => task.column)
   tasks: Task[];
+  board: any;
 }

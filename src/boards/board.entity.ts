@@ -6,7 +6,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { User } from 'src/users/user.entity';
-import { Column as ColumnEntity } from '@/columns/column.entity';
+import { ColumnEntity } from 'src/columns/column.entity';
 
 @Entity('boards')
 export class Board {
@@ -16,9 +16,9 @@ export class Board {
   @Column()
   name: string;
 
-  @ManyToOne(() => User, user => user.boards, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, (user) => user.boards, { onDelete: 'CASCADE' })
   user: User;
 
-  @OneToMany(() => ColumnEntity, column => column.board, { cascade: true })
+  @OneToMany(() => ColumnEntity, (column) => column, { cascade: true })
   columns: ColumnEntity[];
 }

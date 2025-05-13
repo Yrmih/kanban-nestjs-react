@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { Task } from './entities/task.entity';
+import { TaskStatus } from './entities/task.entity';
 import { ColumnEntity } from 'src/columns/column.entity';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto'; // <-- crie esse se ainda não tiver
@@ -46,7 +47,7 @@ export class TasksService {
     const task = this.taskRepository.create({
       title: data.title,
       description: data.description,
-      status: data.status ?? 'pending',
+      status: data.status ?? TaskStatus.PENDING,
       column,
     });
 
