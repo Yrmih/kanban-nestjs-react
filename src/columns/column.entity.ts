@@ -16,7 +16,7 @@ export class ColumnEntity {
   @ColumnDecorator()
   name: string;
 
-  @ManyToOne(() => Board, (board) => board.columns, { onDelete: 'CASCADE' }) // 👈 aqui
+  @ManyToOne(() => Board, (board) => board.columns, { onDelete: 'CASCADE' })
   board: Board;
 
   @OneToMany(() => Task, (task) => task.column)
