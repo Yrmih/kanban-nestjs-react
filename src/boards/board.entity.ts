@@ -19,6 +19,8 @@ export class Board {
   @ManyToOne(() => User, (user) => user.boards, { onDelete: 'CASCADE' })
   user: User;
 
-  @OneToMany(() => ColumnEntity, (column) => column.board, { cascade: true })
+  @OneToMany(() => ColumnEntity, (column: ColumnEntity) => column.board, {
+    cascade: true,
+  })
   columns: ColumnEntity[];
 }

@@ -6,6 +6,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Task } from 'src/tasks/entities/task.entity';
+import { Board } from 'src/boards/board.entity';
 
 @Entity('columns')
 export class ColumnEntity {
@@ -15,10 +16,9 @@ export class ColumnEntity {
   @ColumnDecorator()
   name: string;
 
-  @ManyToOne(() => ColumnEntity, (column) => column)
-  columns: ColumnEntity[];
+  @ManyToOne(() => Board, (board) => board.columns, { onDelete: 'CASCADE' }) // 👈 aqui
+  board: Board;
 
   @OneToMany(() => Task, (task) => task.column)
   tasks: Task[];
-  board: any;
 }
