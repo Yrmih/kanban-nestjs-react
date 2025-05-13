@@ -37,7 +37,7 @@ export class TasksService {
   // Atualizando para usar o UpdateTaskDto
   async create(data: CreateTaskDto): Promise<Task> {
     const column = await this.columnRepository.findOne({
-      where: { id: data.columnId },
+      where: { id: String(data.columnId) }, // Precisei de converter o id para string para garantir que o TypeORM funcione corretamente
     });
 
     if (!column) {
