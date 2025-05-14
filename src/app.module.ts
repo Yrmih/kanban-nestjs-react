@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { BoardsModule } from './boards/boards.module';
 import { ColumnsModule } from './columns/columns.module';
+import { AuthModule } from './auth/auth.module';
 // Importando o módulo de tarefas e a entidade Task
 import { TasksModule } from './tasks/tasks.module';
 

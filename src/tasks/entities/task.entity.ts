@@ -3,9 +3,11 @@ import {
   PrimaryGeneratedColumn,
   Column as ColumnDecorator,
   ManyToOne,
+  OneToMany,
 } from 'typeorm';
 import { ColumnEntity } from 'src/columns/column.entity'; // Importando a entidade Column
 import { User } from 'src/users/users.entity';
+import { SubTask } from './subtask.entity';
 
 export enum TaskStatus {
   PENDING = 'pending',
@@ -41,5 +43,10 @@ export class Task {
     onDelete: 'CASCADE',
   })
   user: User;
+
+  @OneToMany(() => SubTask, (subTask) => subTask.task, {
+    cascade: true,
+  })
+  subTasks: SubTask[];
   // opcional: carrega automaticamente o usuário relacionado
 }

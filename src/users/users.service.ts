@@ -2,14 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './users.entity';
-import { CreateUserDto, GetProfileOutputDto } from './dtos';
+import { CreateUserDto } from './dtos/create-user.dto';
+import { GetProfileOutputDto } from './dtos/get-profile.dto';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private readonly usersRepo: Repository<User>
-  ) { }
+    private readonly usersRepo: Repository<User>,
+  ) {}
 
   async create(data: CreateUserDto): Promise<User> {
     const user = this.usersRepo.create(data);
@@ -29,9 +30,9 @@ export class UsersService {
       where: { id },
       relations: {
         boards: {
-          columns: true
-        }
-      }
+          columns: true,
+        },
+      },
     });
 
     if (!user) return null;
@@ -41,14 +42,14 @@ export class UsersService {
       name: user.name,
       email: user.email,
       avatarUrl: user.avatarUrl,
-      boards: user.boards.map(board => ({
+      boards: user.boards.map((board) => ({
         id: board.id,
         name: board.name,
-        columns: board.columns.map(column => ({
+        columns: board.columns.map((column) => ({
           id: column.id,
-          name: column.name
-        }))
-      }))
+          name: column.name,
+        })),
+      })),
     };
   }
 }

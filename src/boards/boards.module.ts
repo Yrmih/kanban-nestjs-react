@@ -11,4 +11,4 @@ import { User } from 'src/users/users.entity';
   providers: [BoardsService],
   exports: [BoardsService],
 })
-export class BoardsModule { }
+export class BoardsModule {}
