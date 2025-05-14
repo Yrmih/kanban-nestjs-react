@@ -1,19 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { SubTask } from './entities/subtask.entity';
+// src/subtasks/subtasks.controller.ts
+import { Controller, Patch, Param, Body } from '@nestjs/common';
+import { SubTasksService } from './subtasks.service';
+import { UpdateSubTaskStatusDto } from './dtos/update-subtask-status.dto';
 
-@Injectable()
+@Controller('subtasks')
 export class SubTasksController {
-  constructor(
-    @InjectRepository(SubTask)
-    private readonly subTaskRepo: Repository<SubTask>,
-  ) {}
+  constructor(private readonly subTasksService: SubTasksService) {}
 
-  async changeStatus(id: string, isDone: boolean): Promise<SubTask> {
-    const subTask = await this.subTaskRepo.findOne({ where: { id } });
-    if (!subTask) throw new NotFoundException('Subtask not found');
-    subTask.isDone = isDone;
-    return this.subTaskRepo.save(subTask);
+  @Patch(':id/change-status')
+  changeStatus(@Param('id') id: string, @Body() dto: UpdateSubTaskStatusDto) {
+    return this.subTasksService.changeStatus(id, dto);
   }
 }

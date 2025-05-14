@@ -1,89 +1,50 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-
 import { Task } from './entities/task.entity';
-import { TaskStatus } from './entities/task.entity';
+import { Repository } from 'typeorm';
 import { ColumnEntity } from 'src/columns/column.entity';
 import { CreateTaskDto } from './dto/create-task.dto';
-import { UpdateTaskDto } from './dto/update-task.dto';
+import { SubTask } from 'src/subtasks/entities/subtask.entity';
 
 @Injectable()
 export class TasksService {
   constructor(
     @InjectRepository(Task)
-    private readonly taskRepository: Repository<Task>,
+    private readonly taskRepo: Repository<Task>,
 
     @InjectRepository(ColumnEntity)
-    private readonly columnRepository: Repository<ColumnEntity>,
+    private readonly columnRepo: Repository<ColumnEntity>,
+
+    @InjectRepository(SubTask)
+    private readonly subTaskRepo: Repository<SubTask>,
   ) {}
 
-  async findAll(): Promise<Task[]> {
-    return this.taskRepository.find({ relations: ['column'] });
-  }
+  async create(createTaskDto: CreateTaskDto): Promise<Task> {
+    const { title, description, columnId, subTasks = [] } = createTaskDto;
 
-  async findOne(id: number): Promise<Task> {
-    const task = await this.taskRepository.findOne({
-      where: { id },
-      relations: ['column'],
-    });
+    const column = await this.columnRepo.findOne({ where: { id: columnId } });
+    if (!column) throw new NotFoundException('Column not found');
 
-    if (!task) {
-      throw new NotFoundException(`Task #${id} not found`);
-    }
-
-    return task;
-  }
-
-  async create(data: CreateTaskDto): Promise<Task> {
-    const column = await this.columnRepository.findOne({
-      where: { id: String(data.columnId) },
-    });
-
-    if (!column) {
-      throw new NotFoundException(`Column #${data.columnId} not found`);
-    }
-
-    const task = this.taskRepository.create({
-      title: data.title,
-      description: data.description,
-      status: data.status ?? TaskStatus.PENDING,
+    const task = this.taskRepo.create({
+      title,
+      description,
       column,
     });
 
-    return this.taskRepository.save(task);
-  }
+    const savedTask = await this.taskRepo.save(task);
 
-  async update(id: number, data: UpdateTaskDto): Promise<Task> {
-    const task = await this.findOne(id);
+    const subTaskEntities = subTasks.map((sub: { title: any; isDone: any }) =>
+      this.subTaskRepo.create({
+        title: sub.title,
+        isDone: sub.isDone,
+        task: savedTask,
+      }),
+    );
 
-    if (data.columnId) {
-      const column = await this.columnRepository.findOne({
-        where: { id: data.columnId },
-      });
+    await this.subTaskRepo.save(subTaskEntities);
 
-      if (!column) {
-        throw new NotFoundException(`Column #${data.columnId} not found`);
-      }
-
-      task.column = column;
-    }
-
-    task.title = data.title ?? task.title;
-    task.description = data.description ?? task.description;
-    task.status = data.status ?? task.status;
-
-    return this.taskRepository.save(task);
-  }
-
-  async updateStatus(id: number, status: TaskStatus): Promise<Task> {
-    const task = await this.findOne(id);
-    task.status = status;
-    return this.taskRepository.save(task);
-  }
-
-  async remove(id: number): Promise<void> {
-    const task = await this.findOne(id);
-    await this.taskRepository.remove(task);
+    return this.taskRepo.findOne({
+      where: { id: savedTask.id },
+    });
   }
 }

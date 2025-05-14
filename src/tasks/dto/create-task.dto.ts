@@ -1,5 +1,22 @@
-import { IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
+import {
+  IsEnum,
+  IsOptional,
+  IsString,
+  IsUUID,
+  IsArray,
+  ValidateNested,
+  IsBoolean,
+} from 'class-validator';
+import { Type } from 'class-transformer';
 import { TaskStatus } from '../entities/task.entity';
+
+class CreateSubTaskDto {
+  @IsString()
+  title: string;
+
+  @IsBoolean()
+  isDone: boolean;
+}
 
 export class CreateTaskDto {
   @IsString()
@@ -15,4 +32,10 @@ export class CreateTaskDto {
 
   @IsUUID()
   columnId: string;
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateSubTaskDto)
+  subTasks?: CreateSubTaskDto[];
 }
