@@ -24,11 +24,11 @@ import {
 	useNotificationToasty
 } from '~/hooks';
 
-import { userKeys } from '~/utils';
-import { cn } from '~/utils/cn';
-import { generateDefaultColumnsBoard } from '~/utils/generate-default-columns-board';
+import { userKeys } from '../../../../utils/query-keys-factories';
+import { cn } from '../../../../utils/cn';
+import { generateDefaultColumnsBoard } from '../../../../utils/generate-default-columns-board';
 
-import { CreateNewBoardFormValues, schema } from './schema';
+import { type CreateNewBoardFormValues, schema } from './schema';
 
 export function FormCreateNewBoard() {
 	const [isOpen, setIsOpen] = useState(false);
