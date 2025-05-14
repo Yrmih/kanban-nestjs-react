@@ -13,11 +13,10 @@ export function useUpdateTask({ activeBoard }: { activeBoard: BoardType }) {
 		mutationFn: updateTask,
 		onMutate: async (vars) => {
 			const { id, columnId, description, subTasks, title } = vars;
-
 			const queryKey = getTasksKey.single(activeBoard.id);
 
 			// Cancelar requisições pendentes
-			await queryClient.cancelQueries(queryKey);
+			await queryClient.cancelQueries({queryKey});
 
 			// Snapshot dos dados atuais
 			const snapShotTasks = queryClient.getQueryData<GetTasks[]>(queryKey);
@@ -52,7 +51,7 @@ export function useUpdateTask({ activeBoard }: { activeBoard: BoardType }) {
 		},
 		onSettled: () => {
 			const queryKey = getTasksKey.single(activeBoard.id);
-			queryClient.invalidateQueries({ queryKey });
+			queryClient.invalidateQueries({queryKey});
 		},
 	});
 }
