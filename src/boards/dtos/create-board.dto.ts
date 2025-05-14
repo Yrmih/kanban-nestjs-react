@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, IsArray } from 'class-validator';
 
 export class CreateBoardDto {
   title: string;
@@ -10,4 +10,6 @@ export class CreateBoardDto {
 
   @IsString()
   userId: string;
+  @IsArray()
+  columns: Array<{ id?: string; name: string }>;
 }
