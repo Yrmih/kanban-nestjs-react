@@ -1,4 +1,3 @@
-// src/subtasks/subtask.entity.ts
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Task } from 'src/tasks/entities/task.entity';
 
@@ -13,8 +12,6 @@ export class SubTask {
   @Column({ default: false })
   isDone: boolean;
 
-  @ManyToOne(() => Task, (task) => task.subTasks, {
-    onDelete: 'CASCADE',
-  })
+  @ManyToOne(() => Task, (task) => task.subTasks, { onDelete: 'CASCADE' })
   task: Task;
 }

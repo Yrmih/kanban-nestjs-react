@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 import { ColumnEntity } from 'src/columns/column.entity'; // Importando a entidade Column
 import { User } from 'src/users/users.entity';
-import { SubTask } from './subtask.entity';
+import { SubTask } from '../../subtasks/entities/subtask.entity';
 
 export enum TaskStatus {
   PENDING = 'pending',
@@ -46,6 +46,7 @@ export class Task {
 
   @OneToMany(() => SubTask, (subTask) => subTask.task, {
     cascade: true,
+    eager: true,
   })
   subTasks: SubTask[];
   // opcional: carrega automaticamente o usuário relacionado
