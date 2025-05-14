@@ -1,0 +1,9 @@
+# Frontend
+/web/node_modules/
+/web/.next/
+/web/.env
+
+# Backend
+/server/node_modules/
+/server/dist/
+/server/.env
