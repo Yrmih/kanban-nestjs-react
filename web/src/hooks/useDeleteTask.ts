@@ -1,12 +1,9 @@
 import { useMutation } from '@tanstack/react-query';
 
-import { useActiveBoard } from '~/hooks';
-
-import { deleteTask, GetTasks } from '~/services/tasks.service';
-
-import { queryClient } from '~/lib';
-
-import { getTasksKey } from './useGetTasks';
+import { useActiveBoard } from './useActiveBoard';
+import { deleteTask, type GetTasks } from '../services/task.service';
+import { queryClient } from '../lib';
+import { getTasksKey } from './useGetTask';
 
 export const useDeleteTask = () => {
 	const { activeBoard } = useActiveBoard();
@@ -14,12 +11,19 @@ export const useDeleteTask = () => {
 	return useMutation({
 		mutationFn: deleteTask,
 		onMutate: async (data) => {
-			await queryClient.cancelQueries(getTasksKey.single(activeBoard?.id!));
+			if (!activeBoard?.id) return;
 
+			// Cancelar queries relacionadas
+			await queryClient.cancelQueries({
+				queryKey: getTasksKey.single(activeBoard.id)
+			});
+
+			// Pegar dados antigos
 			const oldColumns = queryClient.getQueryData<GetTasks[]>(
-				getTasksKey.single(activeBoard?.id!)
+				getTasksKey.single(activeBoard.id)
 			);
 
+			// Atualizar com os dados novos (exclusão otimista)
 			const newColumns = oldColumns?.map((col) => {
 				const oldTask = col.tasks.find((t) => t.id === data.taskId);
 
@@ -34,11 +38,16 @@ export const useDeleteTask = () => {
 			});
 
 			queryClient.setQueryData(
-				getTasksKey.single(activeBoard?.id!),
+				getTasksKey.single(activeBoard.id),
 				newColumns
 			);
 		},
-		onSettled: () =>
-			queryClient.invalidateQueries(getTasksKey.single(activeBoard?.id!))
+		onSettled: () => {
+			if (!activeBoard?.id) return;
+
+			queryClient.invalidateQueries({
+				queryKey: getTasksKey.single(activeBoard.id)
+			});
+		}
 	});
 };
