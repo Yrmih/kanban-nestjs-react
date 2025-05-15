@@ -18,7 +18,7 @@ import type { BoardType } from '../../stores/active-board-store';
 import { useHandleDragEnd } from '../../hooks/useHandleDragEnd';
 import { useGetTasks } from '../../hooks/useGetTask';
 
-import { ActiveTaskCard } from '~/types';
+import type { ActiveTaskCard } from '../../types';
 
 import { Column } from './Column';
 import { OverlayTaskCard } from './OverlayTaskCard';
