@@ -1,18 +1,16 @@
 import { useCallback } from 'react';
 
-import {
-	ButtonSelectOrCreateBoard,
-	ChangeThemeButton,
-	FormCreateNewBoard
-} from '~/shared/components';
+import { ButtonSelectOrCreateBoard } from './ButtonSelectOrCreateBoard';
+import { ChangeThemeButton } from './ChangeTheme';
+import { FormCreateNewBoard } from './forms/create-new-board/CreateNewBoardForm';
 
-import { BoardType } from '~/stores/active-board-store';
-import { useAuthStore } from '~/stores/auth-store';
-import { useMenuActions, useMenuStore } from '~/stores/menu-store';
+import type { BoardType } from '../../stores/active-board-store';
+import { useAuthStore } from '../../stores/auth-store';
+import { useMenuStore, useMenuActions } from '../../stores/menu-store';
 
-import { useActiveBoard } from '~/hooks';
+import { useActiveBoard } from '../../hooks/useActiveBoard';
 
-import { cn } from '~/utils/cn';
+import { cn } from '../../utils/cn';
 
 import KanbanLogoSvg from '~/assets/logo.svg';
 

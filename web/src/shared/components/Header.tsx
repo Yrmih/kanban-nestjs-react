@@ -1,12 +1,8 @@
-// //DeleteBoardDialog,
-// 	FormEditBoard,
-// 	MobileMenuPopover,
-// 	PopoverEditOrDeleteBoard
-
-
-
 import { AddNewTaskForm } from './forms/create-new-task/CreateNewTaskForm';
-
+import { DeleteBoardDialog } from './DeleteBoardDialog';
+import { FormEditBoard } from './forms/edit-board/FormEditBoard';
+import { MobileMenuPopover } from './MobileMenuPopover';
+import { PopoverEditOrDeleteBoard } from './PopupEditOrDeleteBoard';
 
 import { useAuthStore } from '../../stores/auth-store';
 import { useMenuStore } from '../../stores/menu-store';

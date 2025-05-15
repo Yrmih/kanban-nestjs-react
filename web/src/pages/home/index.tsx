@@ -1,12 +1,10 @@
 import { Suspense } from 'react';
 
-import {
-	ButtonActiveSidebar,
-	ColumnsContainerSkeleton,
-	FormEditBoard,
-	Header,
-	SideBar
-} from '~/shared/components';
+import { ButtonActiveSidebar } from '../../shared/components/ButtonActiveSidebar';
+import { ColumnsContainerSkeleton } from '../../shared/components/ColumnsContainerSkeleton';
+import { FormEditBoard } from '../../shared/components/forms/edit-board/FormEditBoard';
+import { Header } from '../../shared/components/Header';
+import { SideBar } from '../../shared/components/SideBar';
 import { ColumnsContainer } from '../../shared/components/ColumnsContainer';
 
 import { useMenuStore } from '../../stores/menu-store';
