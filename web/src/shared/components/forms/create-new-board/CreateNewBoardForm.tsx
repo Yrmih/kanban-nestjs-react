@@ -2,21 +2,20 @@ import { useEffect, useState } from 'react';
 import type { SubmitHandler } from 'react-hook-form';
 
 import { useQueryClient } from '@tanstack/react-query';
-
+import { Button } from '../../Button';
+import { ButtonLoading } from '../../ButtonLoading';
+import { ButtonRemoveItemFormFormFieldArray } from '../../ButtonRemoveItemFromFormFieldArray';
+import { ButtonSelectOrCreateBoard } from '../../ButtonSelectOrCreateBoard';
+import { Label } from '../../Label';
+import { TextField } from '../../TextField';
 import {
-	Button,
-	ButtonLoading,
-	ButtonRemoveItemFormFormFieldArray,
-	ButtonSelectOrCreateBoard,
-	Dialog,
-	DialogContent,
-	DialogHeader,
-	DialogOverlay,
-	DialogPortal,
-	DialogTrigger,
-	Label,
-	TextField
-} from '~/shared/components';
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTrigger
+} from '../../Dialog';
  
 import { useCreateBoardMutation } from '../../../../hooks/useCreateBoard';
 import { useInteractiveForm } from '../../../../hooks/useInteractiveForm';
@@ -52,7 +51,7 @@ export function FormCreateNewBoard() {
 	});
 
 	const onModalChange = () => {
-		if (mutation.isLoading) return;
+		if (mutation.isPending) return;
 		setIsOpen((prev) => !prev);
 		handleResetForm();
 	};
@@ -79,7 +78,7 @@ export function FormCreateNewBoard() {
 			});
 			setIsOpen(false);
 		}
-	}, [mutation.isSuccess]);
+	}, [mutation.isSuccess, queryClient, setIsOpen]);
 
 	return (
 		<Dialog onOpenChange={onModalChange} open={isOpen}>
@@ -141,7 +140,7 @@ export function FormCreateNewBoard() {
 											value: ''
 										})
 									}
-									disabled={mutation.isLoading}
+									disabled={mutation.isPending}
 								>
 									<span className="mb-0.5 inline-block font-bold">+</span>Add
 									New Column
@@ -149,7 +148,7 @@ export function FormCreateNewBoard() {
 
 								<ButtonLoading
 									type="submit"
-									isLoading={mutation.isLoading}
+									isLoading={mutation.isPending}
 									fallbackText="Creating"
 									disabled={Object.keys(errors).length > 0}
 								>

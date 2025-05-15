@@ -1,33 +1,31 @@
 import { useEffect, useState } from 'react';
 import { Controller, type SubmitHandler } from 'react-hook-form';
-
+import { Button } from '../../Button';
+import { ButtonLoading } from '../../ButtonLoading';
+import { ButtonRemoveItemFormFormFieldArray } from '../../ButtonRemoveItemFromFormFieldArray';
+import { Label } from '../../Label';
+import { SelectStatusTask } from '../../SelectStatusTask';
+import { TextArea } from '../../TextArea';
+import { TextField } from '../../TextField';
 import {
-	Button,
-	ButtonLoading,
-	ButtonRemoveItemFormFormFieldArray,
-	Dialog,
-	DialogContent,
-	DialogHeader,
-	DialogOverlay,
-	DialogPortal,
-	DialogTrigger,
-	Label,
-	SelectStatusTask,
-	TextArea,
-	TextField
-} from '~/shared/components';
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTrigger,
+} from '../../Dialog';
 
 import type { BoardType } from '../../../../stores/active-board-store';
-//useInteractiveForm,
-//useNotificationToasty
+
 import { useCreateNewTaskMutation } from '../../../../hooks/useCreateNewTask';
 import { useInteractiveForm } from '../../../../hooks/useInteractiveForm';
 import { useNotificationToasty } from '../../../../hooks/useNotificationToasty';
 
 import { cn } from '../../../../utils/cn';
 import { mapperTaskToCreate } from '../../../../utils/mapper-create-task-object';
-
-import type { AddNewTaskFormValues, schema } from './schema';
+import type { AddNewTaskFormValues } from './schema';
+import { schema } from './schema';
 
 interface AddNewTaskPropsFormProps {
 	activeBoard?: BoardType;
@@ -83,13 +81,13 @@ export function AddNewTaskForm({ activeBoard }: AddNewTaskPropsFormProps) {
 		setIsOpen((prev) => !prev);
 		handleResetForm();
 	};
-
+  
 	useEffect(() => {
 		if (mutation.isSuccess) {
 			setIsOpen(false);
 			handleResetForm();
 		}
-	}, [mutation.isSuccess]);
+	}, [handleResetForm, mutation.isSuccess]);
 
 	return (
 		<Dialog open={isOpen} onOpenChange={onChangeOpen}>
@@ -168,7 +166,7 @@ export function AddNewTaskForm({ activeBoard }: AddNewTaskPropsFormProps) {
 												'mb-4 my-0': fields.length > 0,
 												'my-4': fields.length === 0
 											})}
-											disabled={mutation.isLoading}
+											disabled={mutation.isPending}
 											onClick={() =>
 												handleInsertField({
 													id: crypto.randomUUID(),
@@ -204,7 +202,7 @@ export function AddNewTaskForm({ activeBoard }: AddNewTaskPropsFormProps) {
 
 							<ButtonLoading
 								type="submit"
-								isLoading={mutation.isLoading}
+								isLoading={mutation.isPending}
 								fallbackText="Creating"
 								disabled={Object.keys(errors).length > 0}
 							>

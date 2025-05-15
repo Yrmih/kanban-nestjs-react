@@ -34,10 +34,10 @@ const mappedErrors = {
 	401: DEFAULT_ERROR_MESSAGES.unauthorizedMessage
 };
 
-// interceptor response and add custom error message if needed
+// Interceptar (ou "interceptar") a resposta da requisição e, se necessário, adicionar uma mensagem de erro personalizada.
 api.interceptors.response.use(
 	(response) => response,
-	(error: AxiosError<any>) => {
+	(error: AxiosError<Record<string, unknown>>) => {
 		if (isAxiosError(error)) {
 			if (error.code === AxiosError.ERR_NETWORK) {
 				error.message = DEFAULT_ERROR_MESSAGES.networkError;
@@ -55,7 +55,8 @@ api.interceptors.response.use(
 				return Promise.reject(error);
 			}
 
-			error.message = error.response?.data.message ?? error.message;
+			error.message = typeof error.response?.data.message === 'string' ? error.response.data.message:
+      error.message;
 			return Promise.reject(error);
 		}
 
