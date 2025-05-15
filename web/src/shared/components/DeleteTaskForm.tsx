@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-import { useNotificationToasty } from '~/hooks';
+import { useNotificationToasty } from '../../hooks/useNotificationToasty';
 import { useDeleteTask } from '~/hooks/useDeleteTask';
 
 import { Button } from './Button';
