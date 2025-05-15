@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { useQueryClient } from '@tanstack/react-query';
-
-import { useActiveBoard,useDeleteBoardMutation, useNotificationToasty  } from '~/hooks';
+// useActiveBoard,useDeleteBoardMutation, useNotificationToasty
+import { useActiveBoard } from '../../hooks/useActiveBoard';
+import { useNotificationToasty } from '../../hooks/useNotificationToasty';
 
 import { userKeys } from '../../utils/query-keys-factories';
 
