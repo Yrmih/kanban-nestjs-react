@@ -1,49 +1,108 @@
-import { useEffect, useCallback } from 'react';
-import { useThemeStore } from '../stores/theme-store';
+import { useEffect } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-export function useTheme() {
-  const { theme, setTheme } = useThemeStore();
+import type { BoardType } from '../stores/active-board-store';
+import type { GetTasks } from '../services/task.service';
+import type { ErrorApi } from '../types';
+import type { UpdateOrderInput } from '../services/task.service';
 
-  // Memorize a função para não criar ela a cada render
-  const changeThemeInHtml = useCallback(() => {
-    const html = document.documentElement;
+import { updateOrder } from '../services/task.service';
+import { getTasksKey } from './useGetTask';
+import { useNotificationToasty } from './useNotificationToasty';
 
-    if (theme === 'light') {
-      html.classList?.remove('dark');
-      html.classList.add('light');
-    } else {
-      html.classList?.remove('light');
-      html.classList.add('dark');
-    }
-  }, [theme]);
+export function useUpdateOrder({ activeBoard }: { activeBoard: BoardType }) {
+  const queryClient = useQueryClient();
+  const notification = useNotificationToasty();
 
-  useEffect(() => {
-    const mediaQueryList = window.matchMedia('(prefers-color-scheme: dark)');
+  const mutation = useMutation<void, ErrorApi, UpdateOrderInput>({
+    mutationFn: updateOrder,
+    onMutate: async (variables) => {
+      const tasksKey = getTasksKey.single(activeBoard.id);
+      const previousTasks = queryClient.getQueryData<GetTasks[]>(tasksKey) ?? [];
+      const previousTasksImmutable = queryClient.getQueryData<GetTasks[]>(tasksKey) ?? [];
 
-    const updateThemeBasedOnPreferences = () => {
-      const match = mediaQueryList.matches;
+      await queryClient.cancelQueries({ queryKey: tasksKey });
 
-      if (match && !theme) {
-        setTheme('dark');
-      }
-    };
-
-    mediaQueryList.addEventListener('change', updateThemeBasedOnPreferences);
-
-    // Executa uma vez para atualizar no início
-    updateThemeBasedOnPreferences();
-
-    return () => {
-      mediaQueryList.removeEventListener(
-        'change',
-        updateThemeBasedOnPreferences
+      const { taskId, destinationColumnId, index } = variables;
+      const oldColumnTask = previousTasks.find((col) =>
+        col.tasks.some((task) => task.id === taskId)
       );
-    };
-  }, [setTheme, theme]);
+
+      if (!oldColumnTask) return { previousTasks };
+
+      const oldColumnTaskIndex = oldColumnTask.tasks.findIndex(
+        (t) => t.id === taskId
+      );
+
+      if (oldColumnTaskIndex < 0) return { previousTasks };
+
+      if (destinationColumnId === oldColumnTask.id) {
+        const oldTaskData = oldColumnTask.tasks[oldColumnTaskIndex];
+
+        oldColumnTask.tasks.splice(oldColumnTaskIndex, 1);
+        oldColumnTask.tasks.splice(index, 0, oldTaskData);
+
+        oldColumnTask.tasks = oldColumnTask.tasks.map((task, i) => ({
+          ...task,
+          index: i
+        }));
+
+        const newPreviousTasks = previousTasks.map((col) =>
+          col.id === destinationColumnId ? oldColumnTask : col
+        );
+
+        queryClient.setQueryData(tasksKey, newPreviousTasks);
+
+        return { previousTasksImmutable, newPreviousTasks };
+      }
+
+      const oldTaskData = oldColumnTask.tasks[oldColumnTaskIndex];
+      oldColumnTask.tasks.splice(oldColumnTaskIndex, 1);
+
+      oldColumnTask.tasks = oldColumnTask.tasks.map((task, i) => ({
+        ...task,
+        index: i
+      }));
+
+      const newColumn = previousTasks.find(
+        (col) => col.id === destinationColumnId
+      );
+
+      if (!newColumn) return { previousTasks };
+
+      newColumn.tasks.splice(index, 0, {
+        ...oldTaskData,
+        columnId: newColumn.id,
+        statusName: newColumn.name
+      });
+
+      newColumn.tasks = newColumn.tasks.map((task, i) => ({
+        ...task,
+        index: i
+      }));
+
+      const newPreviousTasks = previousTasks.map((col) =>
+        col.id === oldColumnTask.id
+          ? oldColumnTask
+          : col.id === newColumn.id
+            ? newColumn
+            : col
+      );
+
+      queryClient.setQueryData(tasksKey, newPreviousTasks);
+
+      return { previousTasksImmutable, newPreviousTasks };
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: getTasksKey.single(activeBoard.id) });
+    }
+  });
 
   useEffect(() => {
-    changeThemeInHtml();
-  }, [changeThemeInHtml]);
+    if (mutation.error) {
+      notification.notification('error', mutation.error?.message ?? 'Erro desconhecido');
+    }
+  }, [mutation.error, notification]);
 
-  return { theme, setTheme };
+  return mutation;
 }

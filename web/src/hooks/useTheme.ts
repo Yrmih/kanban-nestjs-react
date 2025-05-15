@@ -1,43 +1,49 @@
-import { useEffect } from 'react';
-
+import { useEffect, useCallback } from 'react';
 import { useThemeStore } from '../stores/theme-store';
 
 export function useTheme() {
-	const { theme, setTheme } = useThemeStore();
+  const { theme, setTheme } = useThemeStore();
 
-	function changeThemeInHtml() {
-		const html = document.documentElement;
+  // Memorize a função para não criar ela a cada render
+  const changeThemeInHtml = useCallback(() => {
+    const html = document.documentElement;
 
-		if (theme === 'light') {
-			html.classList?.remove('dark');
-			html.classList.add('light');
-		} else {
-			html.classList?.remove('light');
-			html.classList.add('dark');
-		}
-	}
+    if (theme === 'light') {
+      html.classList?.remove('dark');
+      html.classList.add('light');
+    } else {
+      html.classList?.remove('light');
+      html.classList.add('dark');
+    }
+  }, [theme]);
 
-	useEffect(() => {
-		const mediaQueryList = window.matchMedia('(prefers-color-scheme: dark)');
+  useEffect(() => {
+    const mediaQueryList = window.matchMedia('(prefers-color-scheme: dark)');
 
-		const updateThemeBasedOnPreferences = () => {
-			const match = mediaQueryList.matches;
+    const updateThemeBasedOnPreferences = () => {
+      const match = mediaQueryList.matches;
 
-			if (match && !theme) {
-				setTheme('dark');
-			}
-		};
+      if (match && !theme) {
+        setTheme('dark');
+      }
+    };
 
-		mediaQueryList.addEventListener('change', updateThemeBasedOnPreferences);
+    mediaQueryList.addEventListener('change', updateThemeBasedOnPreferences);
 
-		return () =>
-			mediaQueryList.removeEventListener(
-				'change',
-				updateThemeBasedOnPreferences
-			);
-	}, []);
+    // Executa uma vez para atualizar no início
+    updateThemeBasedOnPreferences();
 
-	useEffect(() => changeThemeInHtml(), [theme]);
+    return () => {
+      mediaQueryList.removeEventListener(
+        'change',
+        updateThemeBasedOnPreferences
+      );
+    };
+  }, [setTheme, theme]);
 
-	return { theme, setTheme };
+  useEffect(() => {
+    changeThemeInHtml();
+  }, [changeThemeInHtml]);
+
+  return { theme, setTheme };
 }

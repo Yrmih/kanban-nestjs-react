@@ -1,6 +1,6 @@
 import type { DragEndEvent } from '@dnd-kit/core';
 
-import { TaskCardCurrent } from '~/shared/components/TaskCard';
+import type { TaskCardCurrent } from '../shared/components/TaskCard';
 
 import type { BoardType } from '../stores/active-board-store';
 

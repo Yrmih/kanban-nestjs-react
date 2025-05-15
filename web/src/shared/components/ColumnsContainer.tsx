@@ -4,7 +4,7 @@ import { createPortal } from 'react-dom';
 import {
 	DndContext,
 	DragOverlay,
-	DragStartEvent,
+	type DragStartEvent,
 	KeyboardSensor,
 	MouseSensor,
 	PointerSensor,
@@ -15,8 +15,8 @@ import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 
 import type { BoardType } from '../../stores/active-board-store';
 
-import { useHandleDragEnd } from '~/hooks';
-import { useGetTasks } from '~/hooks/useGetTasks';
+import { useHandleDragEnd } from '../../hooks/useHandleDragEnd';
+import { useGetTasks } from '../../hooks/useGetTask';
 
 import { ActiveTaskCard } from '~/types';
 
