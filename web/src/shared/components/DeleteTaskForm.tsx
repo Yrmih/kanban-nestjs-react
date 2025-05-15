@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
 import { useNotificationToasty } from '../../hooks/useNotificationToasty';
-import { useDeleteTask } from '~/hooks/useDeleteTask';
+import { useDeleteTask } from '../../hooks/useDeleteTask';
 
 import { Button } from './Button';
 import {
@@ -41,7 +41,7 @@ export function DeleteTaskForm({
 		if (mutation.isSuccess) {
 			onChangeModalState();
 		}
-	}, [mutation.isSuccess]);
+	}, [mutation.isSuccess, onChangeModalState]);
 
 	return (
 		<Dialog open={isOpenModal} onOpenChange={onChangeModalState}>
@@ -62,12 +62,12 @@ export function DeleteTaskForm({
 								type="submit"
 								variant="destructive"
 								aria-label="confirm delete task"
-								disabled={mutation.isLoading}
+								disabled={mutation.isPending}
 							>
 								Confirm
 							</Button>
 
-							<DialogClose type="button" asChild disabled={mutation.isLoading}>
+							<DialogClose type="button" asChild disabled={mutation.isPending}>
 								<Button>Cancel</Button>
 							</DialogClose>
 						</form>
