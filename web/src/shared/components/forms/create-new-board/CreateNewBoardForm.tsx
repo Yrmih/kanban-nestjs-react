@@ -17,12 +17,11 @@ import {
 	Label,
 	TextField
 } from '~/shared/components';
-
-import {
-	useCreateBoardMutation,
-	useInteractiveForm,
-	useNotificationToasty
-} from '~/hooks';
+ 
+import { useCreateBoardMutation } from '../../../../hooks/useCreateBoard';
+import { useInteractiveForm } from '../../../../hooks/useInteractiveForm';
+import { useNotificationToasty } from '../../../../hooks/useNotificationToasty';
+	
 
 import { userKeys } from '../../../../utils/query-keys-factories';
 import { cn } from '../../../../utils/cn';

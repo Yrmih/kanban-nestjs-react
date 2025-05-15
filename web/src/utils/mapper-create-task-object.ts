@@ -1,4 +1,4 @@
-import { AddNewTaskFormValues } from '~/shared/components/forms/create-new-task/schema';
+import type { AddNewTaskFormValues } from "../shared/components/forms/create-new-task/schema";
 
 export function mapperTaskToCreate(data: AddNewTaskFormValues) {
 	return {
