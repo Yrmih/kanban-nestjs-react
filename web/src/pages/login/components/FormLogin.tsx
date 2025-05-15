@@ -1,11 +1,12 @@
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { type SubmitHandler, useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
-import { ButtonLoading, Label, TextField } from '~/shared/components';
-
-import { useSignInMutation } from '~/hooks';
+import { ButtonLoading } from '../../../shared/components/ButtonLoading';
+import { Label } from '../../../shared/components/Label';
+import { TextField } from '../../../shared/components/TextField';
+import { useSignInMutation } from '../../../hooks/useSignIn';
 
 const LoginSchema = z.object({
 	email: z.string().min(1, { message: 'Cannot be empty' }).trim(),
@@ -53,7 +54,7 @@ export function FormLogin() {
 
 			<ButtonLoading
 				type="submit"
-				isLoading={signinMutation.isLoading}
+				isLoading={signinMutation.isPending}
 				fallbackText="Logging"
 			>
 				Login

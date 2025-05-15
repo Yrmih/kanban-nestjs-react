@@ -3,9 +3,11 @@ import { type SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
-import { ButtonLoading, Label, TextField } from '~/shared/components';
+import { ButtonLoading } from '../../../shared/components/ButtonLoading';
+import { Label } from '../../../shared/components/Label';
+import { TextField } from '../../../shared/components/TextField';
 
-import { useSignUpMutation } from '~/hooks';
+import { useSignUpMutation } from '../../../hooks/useSignUp';
 
 import { AvatarInput } from './AvatarInput';
 
@@ -97,7 +99,7 @@ export function RegisterForm() {
 
 			<ButtonLoading
 				type="submit"
-				isLoading={signupMutation.isLoading}
+				isLoading={signupMutation.isPending}
 				fallbackText="Saving"
 			>
 				Register

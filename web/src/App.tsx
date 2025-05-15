@@ -1,12 +1,11 @@
-// src/App.tsx
-import AppRoutes from './router/AppRoutes';
+import { Outlet } from 'react-router-dom';
 
-function App() {
-  return (
-    <div>
-      <AppRoutes />
-    </div>
-  );
+import { AppProviders } from '~/shared/components';
+
+export function App() {
+	return (
+		<AppProviders>
+			<Outlet />
+		</AppProviders>
+	);
 }
-
-export default App;
