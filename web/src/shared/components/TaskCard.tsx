@@ -5,7 +5,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { DialogDescription, DialogTrigger } from '@radix-ui/react-dialog';
 import * as Popover from '@radix-ui/react-popover';
 
-import { useChangeStatusSubTask } from '~/hooks/useChangeStatusSubTask';
+import { useChangeStatusSubTask } from '../../hooks/useChangeStatusSubTask';
 import { useMoveTask } from '../../hooks/useMoveTask';
 
 import { cn } from '../../utils/cn';
