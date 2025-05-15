@@ -25,7 +25,7 @@ export function SideBar() {
 			if (activeBoard?.id === board.id) return;
 			setActiveBoard(board);
 		},
-		[activeBoard?.id]
+		[activeBoard?.id, setActiveBoard]
 	);
 
 	return (
