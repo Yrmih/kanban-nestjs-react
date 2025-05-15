@@ -6,12 +6,12 @@ import {
 	PopoverEditOrDeleteBoard
 } from '~/shared/components';
 
-import { useAuthStore } from '~/stores/auth-store';
-import { useMenuStore } from '~/stores/menu-store';
+import { useAuthStore } from '../../stores/auth-store';
+import { useMenuStore } from '../../stores/menu-store';
 
-import { useActiveBoard } from '~/hooks';
+import { useActiveBoard } from '../../hooks/useActiveBoard';
 
-import { cn } from '~/utils/cn';
+import { cn } from '../../utils/cn';
 
 import KanbanLogoSvg from '~/assets/logo.svg';
 
