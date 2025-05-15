@@ -5,12 +5,13 @@ import {
 	Route
 } from 'react-router-dom';
 
-import { LoginPage, RegisterPage } from '~/pages';
+import { LoginPage } from './pages/login';
+import { RegisterPage } from './pages/register';
 
 import { LoadingPage } from '~/shared/components';
 import { RequireAuth } from '~/shared/components/RequireAuth';
 
-import { AuthLayout } from '~/shared/layouts';
+import { AuthLayout } from './shared/layouts';
 
 import { App } from './App';
 
