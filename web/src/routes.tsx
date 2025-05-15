@@ -8,8 +8,8 @@ import {
 import { LoginPage } from './pages/login';
 import { RegisterPage } from './pages/register';
 
-import { LoadingPage } from '~/shared/components';
-import { RequireAuth } from '~/shared/components/RequireAuth';
+import { LoadingPage } from './shared/components/LoadingPage';
+import { RequireAuth } from './shared/components/RequireAuth';
 
 import { AuthLayout } from './shared/layouts';
 
