@@ -6,11 +6,11 @@ import { DialogDescription, DialogTrigger } from '@radix-ui/react-dialog';
 import * as Popover from '@radix-ui/react-popover';
 
 import { useChangeStatusSubTask } from '~/hooks/useChangeStatusSubTask';
-import { useMoveTask } from '~/hooks/useMoveTask';
+import { useMoveTask } from '../../hooks/useMoveTask';
 
-import { cn } from '~/utils';
+import { cn } from '../../utils/cn';
 
-import { Task } from '~/types';
+import type { Task } from '../../types';
 
 import { DeleteTaskForm } from './DeleteTaskForm';
 import {
@@ -22,7 +22,7 @@ import {
 } from './Dialog';
 import { UpdateTaskTaskForm } from './forms/update-task-form/UpdateTaskForm';
 import { Label } from './Label';
-import { Option, SelectStatusTask } from './SelectStatusTask';
+import type { Option, SelectStatusTask } from './SelectStatusTask';
 import { ToggleSubTaskCard } from './ToggleSubTaskCard';
 
 export type TaskCardCurrent = {
