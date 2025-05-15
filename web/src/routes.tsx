@@ -15,7 +15,7 @@ import { AuthLayout } from './shared/layouts';
 
 import { App } from './App';
 
-const HomePage = lazy(() => import('~/pages/home'));
+const HomePage = lazy(() => import('./pages/home'));
 
 export const router = createBrowserRouter(
 	createRoutesFromElements(

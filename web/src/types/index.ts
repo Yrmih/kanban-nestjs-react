@@ -2,7 +2,7 @@ import type { UseMutationResult } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import type { JwtPayload } from 'jwt-decode';
 
-export type MutationFnType<TVar = unknown, TRes = any> = UseMutationResult<
+export type MutationFnType<TVar = unknown, TRes = unknown> = UseMutationResult<
 	TRes,
 	ErrorApi,
 	TVar,
@@ -29,12 +29,12 @@ export interface UserProfile extends User {
 	}[];
 }
 
-export interface ErrorApi
-	extends AxiosError<{
-		message: string;
-		statusCode: number;
-		error: string;
-	}> {}
+type ErrorResponseData = {
+  message: string;
+  statusCode: number;
+  error: string;
+};
+type ErrorApi = AxiosError<ErrorResponseData>;
 
 export type JwtPayloadType = {
 	email: string;

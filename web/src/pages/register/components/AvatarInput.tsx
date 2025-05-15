@@ -82,7 +82,7 @@ export const AvatarInput = React.forwardRef<HTMLInputElement, AvatarInputProps>(
 							}
 						)}
 					>
-						Drag and drop your file here or click to upload
+						Arraste e solte seu arquivo aqui ou clique para fazer upload
 					</label>
 					<input
 						type="file"

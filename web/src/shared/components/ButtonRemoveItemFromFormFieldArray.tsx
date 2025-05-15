@@ -1,12 +1,8 @@
 import React, { forwardRef } from 'react';
-
 import { cn } from '../../utils/cn';
 
 interface ButtonRemoveItemFormFormFieldArrayProps
-	extends React.DetailedHTMLProps<
-		React.ButtonHTMLAttributes<HTMLButtonElement>,
-		HTMLButtonElement
-	> {
+	extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 	isErrorInField?: boolean;
 }
 
@@ -21,7 +17,7 @@ export const ButtonRemoveItemFormFormFieldArray = forwardRef<
 		className={cn(
 			'focus:ring-red group shrink-0 p-0.5 focus:outline-none focus:ring-1 focus:ring-offset-1 rounded',
 			{
-				'my-2': isErrorInField
+				'my-2': isErrorInField,
 			},
 			className
 		)}
@@ -31,6 +27,9 @@ export const ButtonRemoveItemFormFormFieldArray = forwardRef<
 			width="15"
 			height="15"
 			xmlns="http://www.w3.org/2000/svg"
+			viewBox="0 0 15 15"
+			aria-hidden="true"
+			focusable="false"
 		>
 			<g fillRule="evenodd">
 				<path d="m12.728 0 2.122 2.122L2.122 14.85 0 12.728z" />

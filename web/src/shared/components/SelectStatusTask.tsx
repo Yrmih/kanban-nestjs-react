@@ -29,7 +29,7 @@ export function SelectStatusTask({
 				className={cn(
 					'relative flex w-full items-center justify-between gap-2 rounded bg-transparent px-4 h-8 text-sm font-medium text-black outline-none ring-1 ring-transparent transition-colors duration-300 placeholder:text-gray-400 dark:text-white dark:placeholder:text-gray-500 ring-gray-300 dark:ring-linesDark dark:focus:ring-purple dark:hover:ring-purple focus:ring-purple hover:ring-purple disabled:opacity-50 disabled:pointer-events-none'
 				)}
-				arial-label="status"
+				aria-label="status"
 			>
 				<Select.Value placeholder={defaultOption?.value} />
 				<Select.Icon asChild>

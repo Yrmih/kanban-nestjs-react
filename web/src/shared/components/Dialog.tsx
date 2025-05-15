@@ -60,7 +60,7 @@ const DialogContent = React.forwardRef<
 
 		<DialogPrimitive.Close
 			title="close dialog"
-			arial-aria-label="close dialog add new task"
+			aria-label="close dialog add new task"
 			className="dark:hover:text-red hover:text-red absolute right-3 top-2 text-black transition dark:text-gray-500 md:hidden"
 		>
 			<svg

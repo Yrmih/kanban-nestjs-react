@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+body {
+  @apply antialiased scroll-smooth;
+}
+
+@layer base {
+  :root {
+    --skeleton-color: 210 40% 96.1%;
+  }
+}
