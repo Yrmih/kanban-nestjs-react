@@ -1,10 +1,12 @@
-import {
-	AddNewTaskForm,
-	DeleteBoardDialog,
-	FormEditBoard,
-	MobileMenuPopover,
-	PopoverEditOrDeleteBoard
-} from '~/shared/components';
+// //DeleteBoardDialog,
+// 	FormEditBoard,
+// 	MobileMenuPopover,
+// 	PopoverEditOrDeleteBoard
+
+
+
+import { AddNewTaskForm } from './forms/create-new-task/CreateNewTaskForm';
+
 
 import { useAuthStore } from '../../stores/auth-store';
 import { useMenuStore } from '../../stores/menu-store';
