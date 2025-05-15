@@ -1,4 +1,4 @@
-import { DragEndEvent } from '@dnd-kit/core';
+import type { DragEndEvent } from '@dnd-kit/core';
 
 import { TaskCardCurrent } from '~/shared/components/TaskCard';
 
