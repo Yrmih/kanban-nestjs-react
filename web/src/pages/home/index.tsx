@@ -7,7 +7,7 @@ import {
 	Header,
 	SideBar
 } from '~/shared/components';
-import { ColumnsContainer } from '~/shared/components/ColumnsContainer';
+import { ColumnsContainer } from '../../shared/components/ColumnsContainer';
 
 import { useMenuStore } from '../../stores/menu-store';
 
