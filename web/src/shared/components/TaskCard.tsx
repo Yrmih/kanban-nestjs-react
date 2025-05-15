@@ -22,7 +22,9 @@ import {
 } from './Dialog';
 import { UpdateTaskTaskForm } from './forms/update-task-form/UpdateTaskForm';
 import { Label } from './Label';
-import type { Option, SelectStatusTask } from './SelectStatusTask';
+import type { Option } from './SelectStatusTask';
+// IMPORTAÇÃO CORRETA DO COMPONENTE SelectStatusTask SEM 'type'
+import { SelectStatusTask } from './SelectStatusTask';
 import { ToggleSubTaskCard } from './ToggleSubTaskCard';
 
 export type TaskCardCurrent = {
@@ -58,54 +60,71 @@ export function TaskCard({
 	const [isOpenModalViewTask, setIsOpenModalViewTask] = useState(false);
 	const [isOpenModalDelete, setIsOpenModalDelete] = useState(false);
 	const [isOpenModalEditTask, setIsOpenModalEditTask] = useState(false);
+
 	const mutationChangeStatusSubTask = useChangeStatusSubTask();
 	const mutationMoveTask = useMoveTask();
+
 	const [checkedSubtasks, setCheckedSubtask] = useState<string[]>(() =>
-		subtasks?.filter((sub) => sub.isDone).map((sub) => sub.id)
+		subtasks?.filter((sub) => sub.isDone).map((sub) => sub.id) ?? []
 	);
+
 	const completedSubtasksCount = useMemo(
 		() => checkedSubtasks.length ?? 0,
 		[checkedSubtasks]
 	);
-	const [defaultStatus] = statusOptions.filter((s) => s.id === columnId);
-	const { active, transition, transform, setNodeRef, attributes, listeners } =
-		useSortable({
-			id,
-			transition: {
-				duration: 150,
-				easing: 'cubic-bezier(0.25, 1, 0.5, 1)'
-			},
-			data: {
-				id,
-				name,
-				description,
-				columnId,
-				order,
-				statusOptions,
-				subtasks,
-				index,
-				...props,
-				completedSubtasksCount,
-				totalSubtasksCount: subtasks?.length ?? 0
-			}
-		});
 
+	const [defaultStatus] = statusOptions.filter((s) => s.id === columnId);
+
+	const {
+		active,
+		transition,
+		transform,
+		setNodeRef,
+		attributes,
+		listeners
+	} = useSortable({
+		id,
+		transition: {
+			duration: 150,
+			easing: 'cubic-bezier(0.25, 1, 0.5, 1)'
+		},
+		data: {
+			id,
+			name,
+			description,
+			columnId,
+			order,
+			statusOptions,
+			subtasks,
+			index,
+			...props,
+			completedSubtasksCount,
+			totalSubtasksCount: subtasks?.length ?? 0
+		}
+	});
+
+	// Remove 'id' das dependências pois não é usado
 	const handleChangeModalDelete = useCallback(() => {
 		setIsOpenModalDelete((prev) => !prev);
 		setIsOpenModalViewTask(false);
-	}, [id]);
+	}, []);
 
+	// Remove 'id' das dependências pois não é usado
 	const handleChangeModalEditTask = useCallback(() => {
 		setIsOpenModalEditTask((prev) => !prev);
 		setIsOpenModalViewTask(false);
-	}, [id]);
-
-	const handleMoveTask = useCallback((colId: string) => {
-		mutationMoveTask.mutate({
-			taskId: id,
-			columnId: colId
-		});
 	}, []);
+
+	// Adiciona 'id' e 'mutationMoveTask' nas dependências para corrigir o warning
+	const handleMoveTask = useCallback(
+		(colId: string) => {
+			mutationMoveTask.mutate({
+				taskId: id,
+				columnId: colId
+			});
+		},
+		[id, mutationMoveTask]
+	);
 
 	const handleChangeCheckedSubtask = useCallback(
 		(taskId: string) => {
@@ -116,7 +135,7 @@ export function TaskCard({
 				return newCheckedSubtask;
 			});
 		},
-		[id]
+		[] // id não usado dentro da função, pode remover das dependências
 	);
 
 	const style = {
