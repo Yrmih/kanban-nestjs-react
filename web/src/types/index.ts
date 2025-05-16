@@ -34,7 +34,7 @@ type ErrorResponseData = {
   statusCode: number;
   error: string;
 };
-type ErrorApi = AxiosError<ErrorResponseData>;
+export type ErrorApi = AxiosError<ErrorResponseData>;
 
 export type JwtPayloadType = {
 	email: string;

@@ -8,12 +8,14 @@ import {
   Param,
   Body,
   ParseIntPipe,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { Task } from './entities/task.entity';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
-import { UpdateTaskStatusDto } from './dto/update-task-status.dto'; // novo import
+import { UpdateTaskStatusDto } from './dto/update-task-status.dto';
 
 @Controller('tasks')
 export class TasksController {
@@ -30,7 +32,8 @@ export class TasksController {
   }
 
   @Post()
-  create(@Body() dto: CreateTaskDto) {
+  @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
+  create(@Body() dto: CreateTaskDto): Promise<Task> {
     return this.tasksService.create(dto);
   }
 
@@ -47,14 +50,12 @@ export class TasksController {
     @Param('id', ParseIntPipe) id: number,
     @Body() body: UpdateTaskStatusDto,
   ): Promise<Task> {
-    const updated = await this.tasksService.updateStatus(id, body.status);
-    return updated;
+    return this.tasksService.updateStatus(id, body.status);
   }
+
   @Delete(':id')
-  async remove(
-    @Param('id', ParseIntPipe) id: number,
-  ): Promise<{ message: string }> {
-    await this.tasksService.remove(id);
+  remove(@Param('id', ParseIntPipe) id: number): { message: string } {
+    this.tasksService.remove(id);
     return { message: `Task #${id} deleted successfully.` };
   }
 }

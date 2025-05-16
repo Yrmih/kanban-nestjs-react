@@ -23,4 +23,5 @@ export class Board {
     cascade: true,
   })
   columns: ColumnEntity[];
+  static columns: { board: Board; id?: string; name: string; }[];
 }

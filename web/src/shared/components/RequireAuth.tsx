@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
-
 import { AxiosError } from 'axios';
 
 import { LoadingPage } from './LoadingPage';
@@ -21,18 +20,19 @@ export function RequireAuth({ children }: { children: ReactNode }) {
 			error instanceof AxiosError &&
 			error.message === 'GET_PROFILE_TIMEOUT'
 		) {
-			notification('error', 'O servidor demorou demais para responde 😢');
+			notification('error', 'O servidor demorou demais para responder 😢');
 		}
 	}, [error, notification]);
 
 	if (!token || error) {
-		return <Navigate to="/auth/login" />;
+		return <Navigate to="/auth/login" replace />;
 	}
 
 	if (isLoading && !error) {
 		return <LoadingPage />;
 	}
 
-	
 	return <>{children}</>;
 }
+
+// guardião de rota (ótimo pra rotas privadas no React Router DOM)

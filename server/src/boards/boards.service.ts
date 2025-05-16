@@ -47,7 +47,7 @@ export class BoardsService {
 
     // Se houver colunas no DTO, atualiza-as
     if (dto.columns) {
-      board.columns = dto.columns.map((col) => ({
+      Board.columns = dto.columns.map((col) => ({
         ...col,
         board,
       }));
