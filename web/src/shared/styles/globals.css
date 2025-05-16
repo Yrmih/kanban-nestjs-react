@@ -3,15 +3,77 @@
 @tailwind utilities;
 
 html {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+	font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 body {
-  @apply antialiased scroll-smooth;
+	@apply antialiased scroll-smooth;
+
+	/* Usa as variáveis para background e cor */
+	background-color: hsl(var(--background));
+	color: hsl(var(--foreground));
 }
 
 @layer base {
-  :root {
-    --skeleton-color: 210 40% 96.1%;
-  }
+	:root {
+		--skeleton-color: 210 40% 96.1%;
+
+		--background: 0 0% 100%;
+		--foreground: 222.2 47.4% 11.2%;
+		--card: 0 0% 100%;
+		--card-foreground: 222.2 47.4% 11.2%;
+		--popover: 0 0% 100%;
+		--popover-foreground: 222.2 47.4% 11.2%;
+		--primary: 240 5.9% 10%;
+		--primary-foreground: 0 0% 98%;
+		--secondary: 240 4.8% 95.9%;
+		--secondary-foreground: 240 5.9% 10%;
+		--muted: 240 4.8% 95.9%;
+		--muted-foreground: 240 3.8% 46.1%;
+		--accent: 240 4.8% 95.9%;
+		--accent-foreground: 240 5.9% 10%;
+		--destructive: 0 84.2% 60.2%;
+		--destructive-foreground: 0 0% 98%;
+		--border: 240 5.9% 90%;
+		--input: 240 5.9% 90%;
+		--ring: 240 5% 64.9%;
+		--radius: 0.5rem;
+	}
+
+	.dark {
+		--background: 224 71% 4%;
+		--foreground: 213 31% 91%;
+		--card: 224 71% 4%;
+		--card-foreground: 213 31% 91%;
+		--popover: 224 71% 4%;
+		--popover-foreground: 213 31% 91%;
+		--primary: 210 40% 98%;
+		--primary-foreground: 222.2 47.4% 1.2%;
+		--secondary: 222.2 47.4% 11.2%;
+		--secondary-foreground: 210 40% 98%;
+		--muted: 215 27.9% 16.9%;
+		--muted-foreground: 217.9 10.6% 64.9%;
+		--accent: 216 34% 17%;
+		--accent-foreground: 210 40% 98%;
+		--destructive: 0 62.8% 30.6%;
+		--destructive-foreground: 210 40% 98%;
+		--border: 216 34% 17%;
+		--input: 216 34% 17%;
+		--ring: 216 34% 17%;
+	}
+}
+
+@keyframes draw {
+	0% {
+		stroke-dashoffset: 100;
+	}
+	100% {
+		stroke-dashoffset: 0;
+	}
+}
+
+.animated-svg path {
+	stroke-dasharray: 100;
+	stroke-dashoffset: 100;
+	animation: draw 1s linear forwards;
 }

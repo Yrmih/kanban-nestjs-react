@@ -9,12 +9,13 @@ import {
   ParseUUIDPipe,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
+import { CreateTaskDto } from './dto/create-task.input.dto';
+import { UpdateTaskInputDto } from './dto/update-task-status.dto';
+import { UpdateTasksOrderDto } from './dto/update-tasks-order';
 
-import {
-  CreateTaskDto,
-  UpdateTaskInputDto,
-  UpdateTasksOrderDto,
-} from './dtos';
+//  CreateTaskDto,
+//   UpdateTaskInputDto,
+//   UpdateTasksOrderDto,
 
 @Controller('tasks')
 export class TasksController {

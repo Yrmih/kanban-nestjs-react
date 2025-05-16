@@ -3,7 +3,7 @@ import { Task } from './entities/task.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ColumnEntity } from 'src/columns/column.entity'; // Importando a entidade Column
-import { CreateTaskDto } from './dto/create-task.dto';
+import { CreateTaskDto } from './dto/create-task.input.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { TaskStatus } from './entities/task.entity'; // Importando o enum TaskStatus
 
@@ -15,7 +15,7 @@ export class TasksService {
 
     @InjectRepository(ColumnEntity)
     private readonly columnRepository: Repository<ColumnEntity>, // Injetar o repositório da Column
-  ) {}
+  ) { }
 
   async findAll(): Promise<Task[]> {
     return this.taskRepository.find();

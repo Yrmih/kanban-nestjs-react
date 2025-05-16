@@ -1,33 +1,40 @@
 import { useEffect } from 'react';
+import { useCallback } from 'react';
 import { Controller, type SubmitHandler } from 'react-hook-form';
 
 import { z } from 'zod';
+// ButtonLoading,
+// 	ButtonRemoveItemFormFormFieldArray,
+// 	Dialog,
+// 	DialogContent,
+// 	DialogHeader,
+// 	DialogOverlay,
+// 	DialogPortal,
+// 	Label,
+// 	SelectStatusTask,
+// 	TextArea,
+// 	TextField
+import { Button } from '../../Button';
+import { ButtonLoading } from '../../ButtonLoading';
+import { ButtonRemoveItemFormFormFieldArray } from '../../ButtonRemoveItemFromFormFieldArray';
+import { Label } from '../../Label';
+import { SelectStatusTask } from '../../SelectStatusTask';
+import { TextArea } from '../../TextArea';
+import { TextField } from '../../TextField';
+import { Dialog, DialogContent, DialogHeader, DialogOverlay, DialogPortal } from '../../Dialog';
 
-import {
-	Button,
-	ButtonLoading,
-	ButtonRemoveItemFormFormFieldArray,
-	Dialog,
-	DialogContent,
-	DialogHeader,
-	DialogOverlay,
-	DialogPortal,
-	Label,
-	SelectStatusTask,
-	TextArea,
-	TextField} from '~/shared/components';
-
-import {
-useActiveBoard,	useInteractiveForm,
-	useNotificationToasty,
-	useUpdateTask
- } from '~/hooks';
-
+// useActiveBoard,	useInteractiveForm,
+// 	useNotificationToasty,
+// 	useUpdateTask
+import { useActiveBoard } from '../../../../hooks/useActiveBoard';
+import { useNotificationToasty } from '../../../../hooks/useNotificationToasty';
+import { useUpdateTask } from '../../../../hooks/useUpdateTask';
 import { cn } from '../../../../utils/cn';
 
 import type { Task } from '../../../../types';
 
 import { schema } from './schema';
+import { useInteractiveForm } from '../../../../hooks/useInteractiveForm';
 
 interface UpdateTaskTaskFormProps {
 	task: Task;
@@ -96,17 +103,18 @@ export function UpdateTaskTaskForm({
 		);
 	};
 
-	const onChangeOpen = () => {
-		handleResetForm();
-		onChangeModalState();
-	};
+	const onChangeOpen = useCallback(() => {
+	handleResetForm();
+	onChangeModalState();
+}, [handleResetForm, onChangeModalState]);
 
-	useEffect(() => {
-		if (mutation.isSuccess) {
-			handleResetForm();
-			onChangeOpen();
-		}
-	}, [mutation.isSuccess]);
+useEffect(() => {
+	if (mutation.isSuccess) {
+		handleResetForm();
+		onChangeOpen();
+	}
+}, [handleResetForm, mutation.isSuccess, onChangeOpen]);
+
 
 	return (
 		<Dialog open={isOpenModal} onOpenChange={onChangeOpen}>
@@ -165,7 +173,7 @@ export function UpdateTaskTaskForm({
 											'mb-4 my-0': fields.length > 0,
 											'my-4': fields.length === 0
 										})}
-										disabled={mutation.isLoading}
+										disabled={mutation.isPending}
 										onClick={() =>
 											handleInsertField({
 												id: crypto.randomUUID(),
@@ -203,9 +211,9 @@ export function UpdateTaskTaskForm({
 
 							<ButtonLoading
 								type="submit"
-								isLoading={mutation.isLoading}
+								isLoading={mutation.isPending}
 								fallbackText="Saving"
-								disabled={Object.keys(errors).length > 0 || mutation.isLoading}
+								disabled={Object.keys(errors).length > 0 || mutation.isPending}
 							>
 								Save Changes
 							</ButtonLoading>

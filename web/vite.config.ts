@@ -1,16 +1,18 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import svgr from 'vite-plugin-svgr';  // <-- importa o plugin
+import svgr from 'vite-plugin-svgr';
 import path from 'path';
+import tailwindcss from '@tailwindcss/vite'; // ✅ importa o plugin do Tailwind
 
 export default defineConfig({
   plugins: [
     react(),
-    svgr()  // <-- adiciona o plugin aqui
+    svgr(),
+    tailwindcss(), // ✅ adiciona aqui
   ],
   resolve: {
     alias: {
-      '~': path.resolve(__dirname, 'src') // <-- seu alias "~" para "src"
-    }
-  }
+      '~': path.resolve(__dirname, 'src'),
+    },
+  },
 });

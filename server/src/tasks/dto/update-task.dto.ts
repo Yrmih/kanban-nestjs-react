@@ -1,7 +1,7 @@
 import { IsOptional, IsString, IsIn, IsUUID } from 'class-validator';
 import { TaskStatus } from '../task-status.enum';
 import { PartialType } from '@nestjs/mapped-types';
-import { CreateTaskDto } from './create-task.dto';
+import { CreateTaskDto } from './create-task.input.dto';
 
 export class UpdateTaskDto extends PartialType(CreateTaskDto) {
   @IsOptional()

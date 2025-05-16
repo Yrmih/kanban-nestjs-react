@@ -1,24 +1,27 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import {
-  CreateTaskDto,
-  CreateTaskOutPutDto,
-  GetTasksOutputDto,
-  UpdateTasksOrderDto
-} from './dtos';
+// CreateTaskDto,
+//   CreateTaskOutPutDto,
+//   GetTasksOutputDto,
+//   UpdateTasksOrderDto
+import { CreateTaskDto } from './dto/create-task.input.dto';
+import { CreateTaskOutPutDto } from './dto/create-task-output.dto';
+import { GetTasksOutputDto } from './dto/get-tasks-output.dto';
 import { UpdateTaskInputDto } from './dtos/update-task-input.dto';
 import { Task } from './task.entity';
 import { SubTask } from 'src/subtasks/entities/subtask.entity';
 import { Column } from './entities/column.entity';
-import { TaskMapper } from './mappers/task-mapper';
+import { TaskMapper } from './task.mapper';
 import { TaskStatus } from './task-status.enum';
+import { UpdateTasksOrderDto } from './dto/update-tasks-order';
 
 @Injectable()
 export class TasksService {
   constructor(
     @InjectRepository(Task) private readonly taskRepository: Repository<Task>,
-    @InjectRepository(SubTask) private readonly subTaskRepository: Repository<SubTask>,
+    @InjectRepository(SubTask)
+    private readonly subTaskRepository: Repository<SubTask>,
     @InjectRepository(Column) private readonly columnRepository: Repository<Column>
   ) {}
 
@@ -200,41 +203,42 @@ export class TasksService {
     const tasks = await this.taskRepository.find({
       where: { column: { id: columnId } },
       relations: ['subtasks'],
-      order: { order: 'ASC' }
+      order: { order: 'ASC' },
     });
 
-    return tasks.map(task => TaskMapper.toHttpTask(task));
+    return tasks.map((task) => TaskMapper.toHttpTask(task));
   }
 
   async changeStatusTask(taskId: string, columnId: string): Promise<void> {
-  const task = await this.taskRepository.findOne(taskId, { relations: ['column'] });
-  if (!task) throw new NotFoundException('Task not found');
+    const task = await this.taskRepository.findOne(taskId, { relations: ['column'] });
+    if (!task) throw new NotFoundException('Task not found');
 
-  const lastTask = await this.taskRepository.findOne({
-    where: { column: { id: columnId } },
-    order: { order: 'DESC' }
-  });
+    const lastTask = await this.taskRepository.findOne({
+      where: { column: { id: columnId } },
+      order: { order: 'DESC' }
+    });
 
-  const newColumn = await this.columnRepository.findOne(columnId);
-  if (!newColumn) throw new NotFoundException('Column not found');
+    const newColumn = await this.columnRepository.findOne(columnId);
+    if (!newColumn) throw new NotFoundException('Column not found');
 
-  task.column = newColumn;
-  task.order = lastTask ? lastTask.order + 1 : 1;
+    task.column = newColumn;
+    task.order = lastTask ? lastTask.order + 1 : 1;
 
-  //  Aqui você atualiza o status conforme o nome da coluna
-  switch (newColumn.name.toLowerCase()) {
-    case 'to do':
-      task.status = TaskStatus.TODO;
-      break;
-    case 'in progress':
-      task.status = TaskStatus.IN_PROGRESS;
-      break;
-    case 'done':
-      task.status = TaskStatus.DONE;
-      break;
-    default:
-      task.status = TaskStatus.TODO; // fallback
+    //  Aqui você atualiza o status conforme o nome da coluna
+    switch (newColumn.name.toLowerCase()) {
+      case 'to do':
+        task.status = TaskStatus.TODO;
+        break;
+      case 'in progress':
+        task.status = TaskStatus.IN_PROGRESS;
+        break;
+      case 'done':
+        task.status = TaskStatus.DONE;
+        break;
+      default:
+        task.status = TaskStatus.TODO; // fallback
+    }
+
+    await this.taskRepository.save(task);
   }
-
-  await this.taskRepository.save(task);
 }
