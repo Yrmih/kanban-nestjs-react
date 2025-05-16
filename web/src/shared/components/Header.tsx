@@ -40,7 +40,7 @@ export function Header() {
 						}
 					)}
 				>
-					<KanbanLogoSvg />
+					<img src={KanbanLogoSvg} alt="Kanban Logo" />
 					<p className="text-3xl font-bold leading-relaxed text-black dark:text-white">
 						Kanban
 					</p>
@@ -53,7 +53,7 @@ export function Header() {
 						})}
 					>
 						<span className="md:hidden">
-							<KanbanLogoSvg />
+							<img src={KanbanLogoSvg} alt="Kanban Logo" />
 						</span>
 
 						<h2

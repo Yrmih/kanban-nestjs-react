@@ -1,11 +1,10 @@
 import * as Switch from '@radix-ui/react-switch';
 
 import { useTheme } from '../../hooks/useTheme';
-
 import { cn } from '../../utils/cn';
 
-import MoonSvg from '~/assets/moon.svg';
 import SunSvg from '~/assets/sun.svg';
+import MoonSvg from '~/assets/moon.svg';
 
 export function ChangeThemeButton() {
   const { theme, setTheme } = useTheme();
@@ -19,7 +18,8 @@ export function ChangeThemeButton() {
       role="button"
       className="bg-lightGrey dark:bg-veryDarkGrey flex h-12 w-full items-center justify-evenly rounded"
     >
-      <SunSvg />
+      <img src={SunSvg} alt="Sun icon" className="h-6 w-6" />
+      
       <Switch.Root
         aria-label="Switch between dark and light mode"
         checked={theme === 'dark'}
@@ -31,7 +31,7 @@ export function ChangeThemeButton() {
             className={cn(
               'transition-transform absolute top-1/2 -translate-y-1/2 block',
               {
-                'translate-x-4': theme === 'dark'
+                'translate-x-4': theme === 'dark',
               }
             )}
           >
@@ -41,7 +41,8 @@ export function ChangeThemeButton() {
           </span>
         </Switch.Thumb>
       </Switch.Root>
-      <MoonSvg />
+      
+      <img src={MoonSvg} alt="Moon icon" className="h-6 w-6" />
     </div>
   );
 }

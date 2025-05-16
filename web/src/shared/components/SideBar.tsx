@@ -40,7 +40,7 @@ export function SideBar() {
 		>
 			<div className="hidden h-full md:flex md:flex-col md:justify-between">
 				<div className="flex h-20 items-center gap-2 px-6 py-4">
-					<KanbanLogoSvg />
+					<img src={KanbanLogoSvg} alt="Kanban Logo" />
 					<p className="text-3xl font-bold leading-relaxed text-black dark:text-white">
 						Kanban
 					</p>
