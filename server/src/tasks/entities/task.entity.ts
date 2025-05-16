@@ -1,53 +1,46 @@
 import {
   Entity,
   PrimaryGeneratedColumn,
-  Column as ColumnDecorator,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
   ManyToOne,
   OneToMany,
+  Index,
 } from 'typeorm';
-import { ColumnEntity } from 'src/columns/column.entity'; // Importando a entidade Column
-import { User } from 'src/users/users.entity';
-import { SubTask } from '../../subtasks/entities/subtask.entity';
-
-export enum TaskStatus {
-  PENDING = 'pending',
-  IN_PROGRESS = 'in_progress',
-  DONE = 'done',
-}
+import { SubTask } from './subtask.entity';
+import { Column as ColumnEntity } from './column.entity';
 
 @Entity('tasks')
+@Index(['columnId', 'id'])
 export class Task {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-  @ColumnDecorator({ length: 100 })
-  title: string;
+  @Column()
+  name: string;
 
-  @ColumnDecorator({ nullable: true })
+  @Column({ nullable: true })
   description?: string;
 
-  @ColumnDecorator({
-    type: 'enum',
-    enum: TaskStatus,
-    default: TaskStatus.PENDING,
-  })
-  status: TaskStatus;
+  @Column()
+  statusName: string;
 
-  @ManyToOne(() => ColumnEntity, (column) => column.tasks, {
-    onDelete: 'CASCADE',
-    eager: true, // opcional: carrega automaticamente a coluna relacionada
-  })
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @Column()
+  order: number;
+
+  @ManyToOne(() => ColumnEntity, column => column.tasks, { onDelete: 'CASCADE' })
   column: ColumnEntity;
 
-  @ManyToOne(() => User, (user) => user.tasks, {
-    onDelete: 'CASCADE',
-  })
-  user: User;
+  @Column()
+  columnId: string;
 
-  @OneToMany(() => SubTask, (subTask) => subTask.task, {
-    cascade: true,
-    eager: true,
-  })
-  subTasks: SubTask[];
-  // opcional: carrega automaticamente o usuário relacionado
+  @OneToMany(() => SubTask, subtask => subtask.task)
+  subtasks: SubTask[];
 }

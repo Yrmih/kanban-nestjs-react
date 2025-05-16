@@ -4,7 +4,7 @@ import { UsersService } from '../users/users.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcrypt';
-import { User } from 'src/users/users.entity'; // Certifique-se de que esse tipo existe
+import { User } from 'src/users/user.entity'; // Certifique-se de que esse tipo existe
 
 interface JwtPayload {
   sub: string;
@@ -16,7 +16,7 @@ export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   async register(dto: RegisterDto): Promise<{ user: User; accessToken: string }> {
     const hashedPassword: string = await bcrypt.hash(dto.password, 10);

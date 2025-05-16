@@ -3,10 +3,12 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
+  CreateDateColumn,
+  UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
-import { User } from 'src/users/users.entity';
-import { ColumnEntity } from 'src/columns/column.entity';
+import { User } from './user.entity';
+import { Column as ColumnEntity } from './column.entity';
 
 @Entity('boards')
 export class Board {
@@ -16,12 +18,18 @@ export class Board {
   @Column()
   name: string;
 
-  @ManyToOne(() => User, (user) => user.boards, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, user => user.boards, { onDelete: 'CASCADE' })
   user: User;
 
-  @OneToMany(() => ColumnEntity, (column: ColumnEntity) => column.board, {
-    cascade: true,
-  })
+  @Column()
+  userId: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @OneToMany(() => ColumnEntity, column => column.board)
   columns: ColumnEntity[];
-  static columns: { board: Board; id?: string; name: string; }[];
 }

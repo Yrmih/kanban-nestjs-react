@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { Board } from 'src/boards/board.entity'; // Ajuste o caminho se necessário
-import { Task } from 'src/tasks/entities/task.entity';
+import { Board } from './board.entity';
+import { RefreshToken } from './refresh-token.entity';
+
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
@@ -18,9 +19,9 @@ export class User {
   @Column({ nullable: true })
   avatarUrl?: string;
 
-  @OneToMany(() => Board, (board) => board.user)
+  @OneToMany(() => Board, board => board.user)
   boards: Board[];
 
-  @OneToMany(() => Task, (task) => task.user)
-  tasks: Task[];
+  @OneToMany(() => RefreshToken, token => token.user)
+  refreshTokens: RefreshToken[];
 }

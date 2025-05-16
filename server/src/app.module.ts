@@ -1,43 +1,24 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { UsersModule } from './users/users.module';
-import { BoardsModule } from './boards/boards.module';
-import { ColumnsModule } from './columns/columns.module';
+import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
-// Importando o módulo de tarefas e a entidade Task
+import { BoardsModule } from './boards/boards.module';
+import { UsersModule } from './users/users.module';
 import { TasksModule } from './tasks/tasks.module';
+import { SubtasksModule } from './subtasks/subtasks.module';
+import { DatabaseModule } from './database/typeorm.module'; // novo módulo de conexão TypeORM
 
 @Module({
   imports: [
-    AuthModule,
-    ColumnsModule,
-    TasksModule,
-    BoardsModule,
-    UsersModule,
-    // Configurações globais do .env
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env',
+      expandVariables: true,
     }),
-
-    // Configurando o TypeORM com o banco de dados PostgreSQL
-    TypeOrmModule.forRootAsync({
-      useFactory: (configService: ConfigService): TypeOrmModuleOptions => {
-        const dbUrl = configService.get<string>('DATABASE_URL');
-        if (!dbUrl) throw new Error('DATABASE_URL is not defined');
-
-        return {
-          type: 'postgres',
-          url: dbUrl,
-          autoLoadEntities: true,
-          synchronize: true, // Não usar em produção!
-        };
-      },
-      inject: [ConfigService],
-    }),
-
+    DatabaseModule,
+    AuthModule,
+    BoardsModule,
+    UsersModule,
     TasksModule,
+    SubtasksModule,
   ],
 })
 export class AppModule {}

@@ -1,24 +1,40 @@
 import {
   Entity,
   PrimaryGeneratedColumn,
-  Column as ColumnDecorator,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
   ManyToOne,
   OneToMany,
+  Unique
 } from 'typeorm';
-import { Task } from 'src/tasks/entities/task.entity';
-import { Board } from 'src/boards/board.entity';
+import { Board } from './board.entity';
+import { Task } from './task.entity';
 
 @Entity('columns')
-export class ColumnEntity {
+@Unique(['name', 'id'])
+export class Column {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ColumnDecorator()
+  @Column()
   name: string;
 
-  @ManyToOne(() => Board, (board) => board.columns, { onDelete: 'CASCADE' })
+  @Column()
+  order: number;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @ManyToOne(() => Board, board => board.columns, { onDelete: 'CASCADE' })
   board: Board;
 
-  @OneToMany(() => Task, (task) => task.column)
+  @Column()
+  boardId: string;
+
+  @OneToMany(() => Task, task => task.column)
   tasks: Task[];
 }

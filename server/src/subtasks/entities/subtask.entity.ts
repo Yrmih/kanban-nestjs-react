@@ -1,22 +1,35 @@
 import {
   Entity,
   PrimaryGeneratedColumn,
-  Column as ColumnDecorator,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
   ManyToOne,
+  Index
 } from 'typeorm';
-import { Task } from 'src/tasks/entities/task.entity';
+import { Task } from './task.entity';
 
-@Entity('subtasks')
+@Entity('sub_tasks')
+@Index(['taskId', 'id'])
 export class SubTask {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ColumnDecorator()
-  title: string;
+  @Column()
+  name: string;
 
-  @ColumnDecorator({ default: false })
+  @Column({ default: false })
   isDone: boolean;
 
-  @ManyToOne(() => Task, (task) => task.subTasks, { onDelete: 'CASCADE' })
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @ManyToOne(() => Task, task => task.subtasks, { onDelete: 'CASCADE' })
   task: Task;
+
+  @Column()
+  taskId: string;
 }

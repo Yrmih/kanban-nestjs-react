@@ -4,14 +4,14 @@ import { Repository } from 'typeorm';
 import { Board } from './board.entity';
 import { CreateBoardDto } from './dtos/create-board.dto';
 import { EditBoardDto } from './dtos/edit-board.dto';
-import { User } from 'src/users/users.entity';
+import { User } from 'src/users/user.entity';
 
 @Injectable()
 export class BoardsService {
   constructor(
     @InjectRepository(Board)
     private readonly boardsRepo: Repository<Board>,
-  ) {}
+  ) { }
 
   async create(dto: CreateBoardDto, userId: string): Promise<Board> {
     const board = this.boardsRepo.create({

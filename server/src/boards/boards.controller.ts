@@ -13,11 +13,11 @@ import { BoardsService } from './boards.service';
 import { CreateBoardDto } from './dtos/create-board.dto';
 import { EditBoardDto } from './dtos/edit-board.dto';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
-import { User } from 'src/users/users.entity';
+import { User } from 'src/users/user.entity';
 
 @Controller('boards')
 export class BoardsController {
-  constructor(private readonly boardsService: BoardsService) {}
+  constructor(private readonly boardsService: BoardsService) { }
 
   @UseGuards(AuthGuard('jwt'))
   @Get()
