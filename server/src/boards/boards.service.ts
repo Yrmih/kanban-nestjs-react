@@ -1,3 +1,4 @@
+// src/boards/boards.service.ts
 import {
   ConflictException,
   Injectable,
@@ -6,7 +7,6 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Board } from './board.entity';
-// CreateBoardInputDto, UpdateBoardInputDto, UpdateBoardOutPutDto
 import { CreateBoardInputDto, UpdateBoardInputDto } from './dtos';
 import { UpdateBoardOutPutDto } from './dtos';
 import { User } from 'src/user/user.entity';
@@ -20,9 +20,7 @@ export class BoardsService {
   ) {}
 
   async findAllByUser(userId: string): Promise<Board[]> {
-    return this.boardRepository.find({
-      where: { userId },
-    });
+    return this.boardRepository.find({ where: { userId } });
   }
 
   async create(data: CreateBoardInputDto & { userId: string }): Promise<void> {
@@ -34,7 +32,6 @@ export class BoardsService {
       throw new ConflictException('Board already exists');
     }
 
-    // Cria as colunas com ID gerado para salvar no JSON
     const columns = (data.initialColumns || []).map((name) => ({
       id: uuidv4(),
       name,
@@ -59,14 +56,10 @@ export class BoardsService {
       where: { id: boardId },
     });
 
-    if (!board) {
-      throw new NotFoundException('Board not found');
-    }
+    if (!board) throw new NotFoundException('Board not found');
 
-    // Atualiza nome
     board.name = name;
 
-    // Atualiza colunas, gerando id para colunas novas
     board.columns = columns.map((col) => ({
       id: col.id || uuidv4(),
       name: col.name,
@@ -83,10 +76,21 @@ export class BoardsService {
   async delete(id: string): Promise<void> {
     const board = await this.boardRepository.findOne({ where: { id } });
 
-    if (!board) {
-      throw new NotFoundException('Board not found');
-    }
+    if (!board) throw new NotFoundException('Board not found');
 
     await this.boardRepository.delete(id);
+  }
+
+  async updateBoardCover(boardId: string, imageUrl: string, userId: string) {
+    const board = await this.boardRepository.findOne({
+      where: { id: boardId, userId },
+    });
+
+    if (!board) {
+      throw new NotFoundException('Board not found or unauthorized');
+    }
+
+    board.coverUrl = imageUrl;
+    return this.boardRepository.save(board);
   }
 }

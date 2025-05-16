@@ -1,14 +1,13 @@
-import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import { User } from 'src/user/user.entity';
+import { createParamDecorator } from '@nestjs/common';
 
-import { Request } from 'express';
-
-export const GetUser = createParamDecorator(
-  (data: unknown, ctx: ExecutionContext): User => {
-    const request = ctx.switchToHttp().getRequest<Request>();
-    return request.user as User;
+export const GetUserProperties = createParamDecorator(
+  (data: string | undefined, req) => {
+    const request = req.switchToHttp().getRequest();
+    const user = request.user;
+    return data ? user && user?.[data] : user;
   },
 );
+
 
 // O decorator `@GetUser()` é usado para extrair o usuário autenticado do contexto da requisição.
 // Ele é criado usando a função `createParamDecorator` do NestJS.

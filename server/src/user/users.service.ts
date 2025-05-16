@@ -11,7 +11,7 @@ export class UsersService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  async create(data: CreateUserDto): Promise<void> {
+  async create(data: CreateUserDto): Promise<User> {
     const user = this.userRepository.create({
       email: data.email,
       password: data.password,
@@ -19,7 +19,7 @@ export class UsersService {
       ...(data.avatarUrl && { avatarUrl: data.avatarUrl }),
     });
 
-    await this.userRepository.save(user);
+    return await this.userRepository.save(user);
   }
 
   async findByEmail(email: string): Promise<User | null> {
