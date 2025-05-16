@@ -1,14 +1,20 @@
-// src/subtasks/subtasks.controller.ts
-import { Controller, Patch, Param, Body } from '@nestjs/common';
-import { SubTasksService } from './subtasks.service';
-import { UpdateSubTaskStatusDto } from './dtos/update-subtask-status.dto';
+import { Body, Controller, Param, Patch } from '@nestjs/common';
+import { UpdateStatusSubTaskInputDto } from './dtos/update-status-subtask.dto';
+import { UpdateStatusSubTaskOutPutDto } from './dtos/update-status-subtask.dto';
+import { SubtasksService } from './subtasks.service';
 
 @Controller('subtasks')
-export class SubTasksController {
-  constructor(private readonly subTasksService: SubTasksService) {}
+export class SubtasksController {
+  constructor(private readonly subtasksService: SubtasksService) {}
 
-  @Patch(':id/change-status')
-  changeStatus(@Param('id') id: string, @Body() dto: UpdateSubTaskStatusDto) {
-    return this.subTasksService.changeStatus(id, dto);
+  @Patch(':subTaskId/change-status')
+  async changeStatus(
+    @Param('subTaskId') id: string,
+    @Body() updateSubTaskStatusDto: UpdateStatusSubTaskInputDto,
+  ): Promise<UpdateStatusSubTaskOutPutDto> {
+    return this.subtasksService.updateSubTaskStatus(
+      id,
+      updateSubTaskStatusDto.isDone,
+    );
   }
 }

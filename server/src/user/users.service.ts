@@ -16,50 +16,36 @@ export class UsersService {
       email: data.email,
       password: data.password,
       name: data.name,
-      avatarUrl: data.avatarUrl ?? null,
+      ...(data.avatarUrl && { avatarUrl: data.avatarUrl }),
     });
 
     await this.userRepository.save(user);
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    return await this.userRepository.findOne({
-      where: { email },
-    });
+    return await this.userRepository.findOne({ where: { email } });
   }
 
   async findById(id: string): Promise<User | null> {
-    return await this.userRepository.findOne({
-      where: { id },
-    });
+    return await this.userRepository.findOne({ where: { id } });
   }
 
   async getProfile(id: string): Promise<GetProfileOutputDto | null> {
     const user = await this.userRepository.findOne({
       where: { id },
-      relations: {
-        boards: {
-          columns: true,
-        },
-      },
+      // relations: { boards: { columns: true } }, // <- descomente quando tiver Board
     });
 
     if (!user) return null;
 
-    // Ajustar para só retornar os campos esperados no GetProfileOutputDto
+    const { name, email, avatarUrl } = user;
+
     return {
       id: user.id,
-      name: user.name,
-      email: user.email,
-      avatarUrl: user.avatarUrl,
-      boards: user.boards.map((board) => ({
-        id: board.id,
-        name: board.name,
-        columns: board.columns.map((column) => ({
-          id: column.id,
-          name: column.name,
-        })),
-      })),
+      name,
+      email,
+      avatarUrl,
+      boards: [], // <- substituir quando a entidade `Board` estiver pronta
     };
   }
 }

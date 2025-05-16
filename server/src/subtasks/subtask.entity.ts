@@ -15,4 +15,5 @@ export class SubTask {
 
   @ManyToOne(() => Task, (task) => task.subTasks)
   task: Task;
+  name: string;
 }

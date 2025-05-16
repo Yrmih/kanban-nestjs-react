@@ -15,25 +15,23 @@ import { EditBoardDto } from './dtos/edit-board.dto';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { User } from 'src/user/user.entity';
 
+@UseGuards(AuthGuard('jwt'))
 @Controller('boards')
 export class BoardsController {
-  constructor(private readonly boardsService: BoardsService) { }
+  constructor(private readonly boardsService: BoardsService) {}
 
-  @UseGuards(AuthGuard('jwt'))
   @Get()
   findAll(@GetUser() user: User) {
     return this.boardsService.findAllByUser(user.id);
   }
 
-  @UseGuards(AuthGuard('jwt'))
   @Post()
   create(@Body() dto: CreateBoardDto, @GetUser() user: User) {
     return this.boardsService.create(dto, user.id);
   }
 
-  @UseGuards(AuthGuard('jwt'))
   @Patch(':id/update')
-  async update(
+  update(
     @Param('id') boardId: string,
     @Body() dto: EditBoardDto,
     @GetUser() user: User,
@@ -41,9 +39,8 @@ export class BoardsController {
     return this.boardsService.updateBoard(boardId, dto, user.id);
   }
 
-  @UseGuards(AuthGuard('jwt'))
   @Delete(':id/delete')
-  async delete(@Param('id') boardId: string, @GetUser() user: User) {
+  delete(@Param('id') boardId: string, @GetUser() user: User) {
     return this.boardsService.deleteBoard(boardId, user.id);
   }
 }

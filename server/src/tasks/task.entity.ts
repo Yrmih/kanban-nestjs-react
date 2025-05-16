@@ -1,6 +1,6 @@
 // task.entity.ts
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { SubTask } from 'src/subtasks/entities/subtask.entity';
+import { SubTask } from 'src/subtasks/subtask.entity';
 import { TaskStatus } from './task-status.enum';
 @Entity()
 export class Task {

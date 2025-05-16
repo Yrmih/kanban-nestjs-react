@@ -6,9 +6,5 @@ export interface GetProfileOutputDto {
   boards: {
     id: string;
     name: string;
-    columns: {
-      id: string;
-      name: string;
-    }[];
   }[];
 }

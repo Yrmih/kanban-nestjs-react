@@ -1,14 +1,12 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm'; // Importa TypeOrmModule
+import { Task } from './task.entity'; // Importa a entidade Task
 import { TasksService } from './tasks.service';
 import { TasksController } from './tasks.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Task } from './task.entity';
-import { ColumnEntity } from 'src/columns/column.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Task, ColumnEntity])],
+  imports: [TypeOrmModule.forFeature([Task])], // Registra a entidade para injeção do repositório
   providers: [TasksService],
   controllers: [TasksController],
-  exports: [TasksService],
 })
 export class TasksModule {}

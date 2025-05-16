@@ -1,28 +1,39 @@
-// src/subtasks/subtasks.service.ts
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { SubTask } from './entities/subtask.entity';
-import { UpdateSubTaskStatusDto } from './dtos/update-subtask-status.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { SubTask } from './subtask.entity';
+
+// Importa o DTO de saída
+import { UpdateStatusSubTaskOutPutDto } from './dtos/update-status-subtask.dto';
 
 @Injectable()
-export class SubTasksService {
+export class SubtasksService {
   constructor(
     @InjectRepository(SubTask)
-    private readonly subTaskRepo: Repository<SubTask>,
+    private readonly subTaskRepository: Repository<SubTask>,
   ) {}
 
-  async changeStatus(
-    id: string,
-    dto: UpdateSubTaskStatusDto,
-  ): Promise<SubTask> {
-    const subtask = await this.subTaskRepo.findOne({ where: { id } });
+  async updateSubTaskStatus(
+    subTaskId: string,
+    isDone: boolean,
+  ): Promise<UpdateStatusSubTaskOutPutDto> {
+    const existingSubTask = await this.subTaskRepository.findOne({
+      where: { id: subTaskId },
+    });
 
-    if (!subtask) {
+    if (!existingSubTask) {
       throw new NotFoundException('Subtask not found');
     }
 
-    subtask.isDone = dto.isDone;
-    return this.subTaskRepo.save(subtask);
+    existingSubTask.isDone = isDone;
+
+    const updatedSubTask = await this.subTaskRepository.save(existingSubTask);
+
+    // Aqui você mapeia o retorno para o formato que o DTO exige
+    return {
+      id: updatedSubTask.id,
+      name: updatedSubTask.name, // garante que isso exista na entidade SubTask
+      isDone: updatedSubTask.isDone,
+    };
   }
 }
