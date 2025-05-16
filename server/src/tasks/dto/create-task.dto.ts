@@ -1,41 +1,22 @@
-import {
-  IsEnum,
-  IsOptional,
-  IsString,
-  IsUUID,
-  IsArray,
-  ValidateNested,
-  IsBoolean,
-} from 'class-validator';
+// create-task.dto.ts
+import { IsString, IsNotEmpty, IsArray, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
-import { TaskStatus } from '../entities/task.entity';
-
-class CreateSubTaskDto {
-  @IsString()
-  title: string;
-
-  @IsBoolean()
-  isDone: boolean;
-}
+import { SubTaskDto } from 'src/subtasks/dtos/sub-task.dto';
 
 export class CreateTaskDto {
   @IsString()
+  @IsNotEmpty()
   title: string;
 
-  @IsOptional()
   @IsString()
-  description?: string;
+  description: string;
 
-  @IsOptional()
-  @IsEnum(TaskStatus)
-  status?: TaskStatus;
+  @IsString()
+  @IsNotEmpty()
+  columnId: string; // Se sua entidade Task tem coluna associada
 
-  @IsUUID()
-  columnId: string;
-
-  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => CreateSubTaskDto)
-  subTasks?: CreateSubTaskDto[];
+  @Type(() => SubTaskDto)
+  subTasks: SubTaskDto[];
 }

@@ -1,61 +1,67 @@
 import {
   Controller,
-  Get,
   Post,
+  Get,
   Put,
-  Patch,
   Delete,
-  Param,
   Body,
-  ParseIntPipe,
-  UsePipes,
-  ValidationPipe,
+  Param,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
-import { Task } from './entities/task.entity';
-import { CreateTaskDto } from './dto/create-task.dto';
-import { UpdateTaskDto } from './dto/update-task.dto';
-import { UpdateTaskStatusDto } from './dto/update-task-status.dto';
+
+import {
+  CreateTaskDto,
+  UpdateTaskInputDto,
+  UpdateTasksOrderDto,
+} from './dtos';
 
 @Controller('tasks')
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
-  @Get()
-  findAll(): Promise<Task[]> {
-    return this.tasksService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<Task> {
-    return this.tasksService.findOne(id);
-  }
-
   @Post()
-  @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  create(@Body() dto: CreateTaskDto): Promise<Task> {
-    return this.tasksService.create(dto);
+  async createTask(@Body() data: CreateTaskDto) {
+    return this.tasksService.createTask(data);
+  }
+
+  // Pega todas as tasks do board (ex: /tasks/board/:boardId)
+  @Get('board/:boardId')
+  async getTasks(@Param('boardId', ParseUUIDPipe) boardId: string) {
+    return this.tasksService.getTasks(boardId);
   }
 
   @Put(':id')
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateData: UpdateTaskDto,
-  ): Promise<Task> {
-    return this.tasksService.update(id, updateData);
-  }
-
-  @Patch(':id/status')
-  async updateStatus(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() body: UpdateTaskStatusDto,
-  ): Promise<Task> {
-    return this.tasksService.updateStatus(id, body.status);
+  async updateTask(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() data: UpdateTaskInputDto,
+  ) {
+    return this.tasksService.updateTask({ id, ...data });
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number): { message: string } {
-    this.tasksService.remove(id);
-    return { message: `Task #${id} deleted successfully.` };
+  async deleteTask(@Param('id', ParseUUIDPipe) id: string) {
+    await this.tasksService.deleteTask(id);
+    return { message: 'Task deleted successfully' };
+  }
+
+  // Atualizar ordem e coluna da task (drag and drop)
+  @Put(':id/order')
+  async updateTaskOrder(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() data: UpdateTasksOrderDto,
+  ) {
+    await this.tasksService.updateTaskOrder({ id, ...data });
+    return { message: 'Task order updated successfully' };
+  }
+
+  // Mudar status da task (mover coluna)
+  @Put(':id/status/:columnId')
+  async changeStatusTask(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('columnId', ParseUUIDPipe) columnId: string,
+  ) {
+    await this.tasksService.changeStatusTask(id, columnId);
+    return { message: 'Task status changed successfully' };
   }
 }

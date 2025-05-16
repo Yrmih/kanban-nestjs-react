@@ -13,7 +13,7 @@ import { BoardsService } from './boards.service';
 import { CreateBoardDto } from './dtos/create-board.dto';
 import { EditBoardDto } from './dtos/edit-board.dto';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
-import { User } from 'src/users/user.entity';
+import { User } from 'src/user/user.entity';
 
 @Controller('boards')
 export class BoardsController {
