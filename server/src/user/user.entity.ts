@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { Board } from 'src/boards/board.entity';
-import { RefreshToken } from 'src/refresh-token/refresh-token.entity';
+import { Board } from '../boards/board.entity';
+import { RefreshToken } from '../refresh-token/refresh-token.entity';
 
 @Entity('users')
 export class User {
@@ -16,8 +16,8 @@ export class User {
   @Column()
   password: string;
 
-  @Column({ nullable: true })
-  avatarUrl: string | null; // <-- aqui, aceita null explicitamente
+  @Column({ type: 'varchar', nullable: true })
+  avatarUrl: string;
 
   @OneToMany(() => Board, (board) => board.user)
   boards: Board[];

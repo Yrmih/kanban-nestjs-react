@@ -17,9 +17,9 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
-    "esModuleInterop": true,  // Para garantir que você pode importar pacotes CommonJS
-    "resolveJsonModule": true  // Para permitir importação de arquivos JSON
+    "esModuleInterop": true,
+    "resolveJsonModule": true
   },
-  "include": ["src/**/*", ".eslintrc.js"], //Garante que o ESLint verifique os arquivos dentro da pasta src e também a configuração .eslintrc.js.
-  "exclude": ["node_modules","dist" ] // Exclui a pasta node_modules e dist da verificação do TypeScript
+  "include": ["src/**/*", ".eslintrc.js"],
+  "exclude": ["node_modules", "dist"]
 }

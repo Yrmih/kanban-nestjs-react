@@ -6,7 +6,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from 'src/user/user.entity';
+import { User } from '../user/user.entity';
 
 @Entity('boards')
 export class Board {
@@ -22,7 +22,6 @@ export class Board {
   @Column()
   userId: string;
 
-  // Aqui, colunas armazenadas como JSON (array de objetos com id e name)
   @Column('jsonb', { nullable: true })
   columns?: { id: string; name: string }[];
 
@@ -31,5 +30,7 @@ export class Board {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @Column({ nullable: true })
   coverUrl: string;
 }

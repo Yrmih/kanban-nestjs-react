@@ -1,6 +1,5 @@
-// sub-task.entity.ts
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
-import { Task } from 'src/tasks/task.entity';
+import { Task } from '../tasks/task.entity';
 
 @Entity()
 export class SubTask {
@@ -15,5 +14,7 @@ export class SubTask {
 
   @ManyToOne(() => Task, (task) => task.subTasks)
   task: Task;
+
+  @Column()
   name: string;
 }

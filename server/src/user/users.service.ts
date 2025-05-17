@@ -18,7 +18,7 @@ export class UsersService {
       email: data.email,
       password: data.password,
       name: data.name,
-      avatarUrl: data.avatarUrl ?? null, // null permitido na entidade
+      avatarUrl: data.avatarUrl // null permitido na entidade
     });
 
     return await this.userRepository.save(user);

@@ -1,6 +1,12 @@
-// task.entity.ts
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { SubTask } from 'src/subtasks/subtask.entity';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { SubTask } from '../subtasks/subtask.entity';
 import { TaskStatus } from './task-status.enum';
 
 @Entity()
@@ -18,7 +24,7 @@ export class Task {
   columnId: string;
 
   @Column()
-  boardId: string; // <=== Adicionado aqui
+  boardId: string;
 
   @OneToMany(() => SubTask, (subTask) => subTask.task, { cascade: true })
   subTasks: SubTask[];
@@ -28,14 +34,14 @@ export class Task {
     enum: TaskStatus,
     default: TaskStatus.TODO,
   })
-  statusName: TaskStatus; // mantido só o enum
+  statusName: TaskStatus;
 
   @Column()
   order: number;
 
-  @Column({ type: 'timestamp' })
+  @CreateDateColumn()
   createdAt: Date;
 
-  @Column({ type: 'timestamp' })
+  @UpdateDateColumn()
   updatedAt: Date;
 }

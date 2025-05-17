@@ -2,5 +2,5 @@ export interface CreateUserDto {
   email: string;
   password: string;
   name: string;
-  avatarUrl?: string | null; // aceitar null aqui
+  avatarUrl?: string; // só opcional, sem o null
 }
