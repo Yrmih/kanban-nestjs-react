@@ -1,11 +1,4 @@
-import {
-  IsArray,
-  IsOptional,
-  IsString,
-  IsUUID,
-  Length,
-  ValidateNested,
-} from 'class-validator';
+import { IsArray, IsOptional, IsString, IsUUID, Length, ValidateNested } from 'class-validator';
 import { SubTaskDto } from './create-task.input.dto';
 import { Type } from 'class-transformer';
 
@@ -13,21 +6,21 @@ export class UpdateTaskInputDto {
   @IsOptional()
   @IsString()
   @Length(5, 50)
-  title: string;
+  title?: string;
 
   @IsOptional()
   @IsString()
   @Length(0, 255)
-  description: string;
+  description?: string;
 
   @IsUUID()
-  columnId: string;
+  boardId: string;
 
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => SubTaskDto)
-  subTasks: SubTaskDto[] = [];
+  subTasks?: SubTaskDto[] = [];
 }
 
 // É um Data Transfer Object usado para atualizar o status de uma tarefa com segurança e validação.

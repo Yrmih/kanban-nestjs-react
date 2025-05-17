@@ -1,9 +1,5 @@
 // src/boards/boards.service.ts
-import {
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Board } from './board.entity';
@@ -47,9 +43,7 @@ export class BoardsService {
     await this.boardRepository.save(board);
   }
 
-  async update(
-    data: UpdateBoardInputDto & { boardId: string },
-  ): Promise<UpdateBoardOutPutDto> {
+  async update(data: UpdateBoardInputDto & { boardId: string }): Promise<UpdateBoardOutPutDto> {
     const { boardId, name, columns } = data;
 
     const board = await this.boardRepository.findOne({

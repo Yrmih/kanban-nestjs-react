@@ -1,8 +1,8 @@
 export interface CreateTaskOutPutDto {
   id: string;
   title: string;
-  description: string;
-  columnId: string;
+  description?: string;
+  boardId: string;
   subTasks: Array<{
     id: string;
     title: string;

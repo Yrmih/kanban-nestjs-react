@@ -17,7 +17,7 @@ export class User {
   password: string;
 
   @Column({ nullable: true })
-  avatarUrl?: string;
+  avatarUrl: string | null; // <-- aqui, aceita null explicitamente
 
   @OneToMany(() => Board, (board) => board.user)
   boards: Board[];

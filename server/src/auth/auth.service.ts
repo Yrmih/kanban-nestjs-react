@@ -4,15 +4,23 @@ import {
   Injectable,
   UnauthorizedException,
   UnsupportedMediaTypeException,
+  NotFoundException,
 } from '@nestjs/common';
-import { UsersService } from 'src/user/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 
+import { UsersService } from 'src/user/users.service';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { RefreshTokenService } from 'src/refresh-token/refresh-token.service';
+
 import { User } from 'src/user/user.entity';
 import { GetProfileOutputDto } from 'src/user/dtos';
+import { RegisterUserDto } from './dto/register-user.dto';
+
+interface JwtPayload {
+  sub: string;
+  email?: string;
+}
 
 @Injectable()
 export class AuthService {
@@ -24,57 +32,52 @@ export class AuthService {
     private readonly cloudinaryService: CloudinaryService,
   ) {}
 
-  public async save(dto: {
-    email: string;
-    password: string;
-    name: string;
-    avatar?: Express.Multer.File;
-  }): Promise<User> {
+  public async save(dto: RegisterUserDto): Promise<User> {
     const conflict = await this.usersService.findByEmail(dto.email);
-    if (conflict) throw new ConflictException('User already exists');
-
-    const saltRounds = parseInt(this.configService.get('SALT_ROUNDS'));
-    const hash = await bcrypt.hash(dto.password, saltRounds);
-
-    let imageUrl: string | null = null;
-    if (dto.avatar) {
-      const avatar = await this.cloudinaryService.uploadImage(dto.avatar).catch(() => {
-        throw new UnsupportedMediaTypeException('Failed to upload avatar');
-      });
-      imageUrl = avatar.secure_url;
+    if (conflict) {
+      throw new ConflictException('User already exists');
     }
 
-    const user = await this.usersService.create({
-      email: dto.email,
-      password: hash,
-      name: dto.name,
-      avatarUrl: imageUrl ?? undefined,
-    });
+    const saltRounds = parseInt(this.configService.get('SALT_ROUNDS') ?? '10', 10);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    const hashedPassword = await bcrypt.hash(dto.password, saltRounds);
 
-    return user;
+    let avatarUrl: string | null = null;
+    if (dto.avatar) {
+      try {
+        const avatar = await this.cloudinaryService.uploadImage(dto.avatar);
+        avatarUrl = avatar.secure_url;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (error) {
+        throw new UnsupportedMediaTypeException('Failed to upload avatar');
+      }
+    }
+
+    return this.usersService.create({
+      email: dto.email,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      password: hashedPassword,
+      name: dto.name,
+      avatarUrl: avatarUrl ?? undefined,
+    });
   }
 
   public async login(
     email: string,
     password: string,
   ): Promise<{ accessToken: string; refreshToken: string }> {
-    const credentialsIsValid = await this.validateCredentials(email, password);
-    if (!credentialsIsValid) {
+    const user = await this.validateCredentials(email, password);
+    if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
     const [accessToken, refreshToken] = await Promise.all([
-      this.generateAccessToken({
-        sub: credentialsIsValid.id,
-        email: credentialsIsValid.email,
-      }),
-      this.generateRefreshToken({
-        sub: credentialsIsValid.id,
-      }),
+      this.generateAccessToken({ sub: user.id, email: user.email }),
+      this.generateRefreshToken({ sub: user.id }),
     ]);
 
     await this.refreshTokenService.saveOrUpdate({
-      userId: credentialsIsValid.id,
+      userId: user.id,
       token: refreshToken,
     });
 
@@ -82,24 +85,30 @@ export class AuthService {
   }
 
   public async getProfile(id: string): Promise<GetProfileOutputDto> {
-    return await this.usersService.getProfile(id);
+    const profile = await this.usersService.getProfile(id);
+    if (!profile) {
+      throw new NotFoundException('User profile not found');
+    }
+    return profile;
   }
 
-  public async refreshToken(user: any) {
-    const [newAccessToken, updatedRefreshToken] = await Promise.all([
+  public async refreshToken(
+    user: JwtPayload,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
+    const [accessToken, refreshToken] = await Promise.all([
       this.generateAccessToken({ sub: user.sub, email: user.email }),
       this.generateRefreshToken({ sub: user.sub }),
     ]);
 
     await this.refreshTokenService.saveOrUpdate({
       userId: user.sub,
-      token: updatedRefreshToken,
+      token: refreshToken,
     });
 
-    return { accessToken: newAccessToken, refreshToken: updatedRefreshToken };
+    return { accessToken, refreshToken };
   }
 
-  public async logout(userId: string) {
+  public async logout(userId: string): Promise<void> {
     await this.refreshTokenService.deleteAllRefreshTokensForUser(userId);
   }
 
@@ -107,20 +116,19 @@ export class AuthService {
     const user = await this.usersService.findByEmail(email);
     if (!user) return null;
 
-    const passwordsMatch = await bcrypt.compare(password, user.password);
-    if (!passwordsMatch) return null;
-
-    return user;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    return isPasswordValid ? user : null;
   }
 
-  private async generateAccessToken(payload: any): Promise<string> {
+  private generateAccessToken(payload: JwtPayload): string {
     return this.jwtService.sign(payload, {
       secret: this.configService.get<string>('ACCESS_TOKEN_SECRET'),
       expiresIn: this.configService.get<string>('ACCESS_TOKEN_EXPIRES_IN'),
     });
   }
 
-  private async generateRefreshToken(payload: any): Promise<string> {
+  private generateRefreshToken(payload: Pick<JwtPayload, 'sub'>): string {
     return this.jwtService.sign(payload, {
       secret: this.configService.get<string>('REFRESH_TOKEN_SECRET'),
       expiresIn: this.configService.get<string>('REFRESH_TOKEN_EXPIRES_IN'),

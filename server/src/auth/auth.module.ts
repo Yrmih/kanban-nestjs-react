@@ -10,12 +10,7 @@ import { AuthService } from './auth.service';
 import { JwtStrategy, RtJwtStrategy } from './strategies';
 
 @Module({
-  imports: [
-    UsersModule,
-    PassportModule,
-    CloudinaryModule,
-    JwtModule.register({}),
-  ],
+  imports: [UsersModule, PassportModule, CloudinaryModule, JwtModule.register({})],
   providers: [AuthService, RefreshTokenService, JwtStrategy, RtJwtStrategy],
   controllers: [AuthController],
 })

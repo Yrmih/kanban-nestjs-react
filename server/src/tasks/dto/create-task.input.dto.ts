@@ -11,9 +11,8 @@ import {
 
 export class SubTaskDto {
   @IsOptional()
-  @IsString()
   @IsUUID()
-  id: string;
+  id?: string;
 
   @IsString()
   @IsNotEmpty()
@@ -21,7 +20,7 @@ export class SubTaskDto {
 
   @IsOptional()
   @IsBoolean()
-  isDone: boolean;
+  isDone?: boolean;
 }
 
 export class CreateTaskDto {
@@ -29,12 +28,13 @@ export class CreateTaskDto {
   @IsNotEmpty()
   title: string;
 
+  @IsOptional() // descrição é opcional
   @IsString()
-  description: string;
+  description?: string;
 
-  @IsString()
+  @IsUUID()
   @IsNotEmpty()
-  columnId: string;
+  boardId: string;
 
   @IsArray()
   @ValidateNested({ each: true })

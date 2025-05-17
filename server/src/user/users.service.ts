@@ -2,7 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
-import { CreateUserDto, GetProfileOutputDto } from './dtos';
+import { CreateUserDto } from './dtos/create-user.dto';
+import { GetProfileOutputDto } from './dtos/get-profile-output.dto';
 
 @Injectable()
 export class UsersService {
@@ -12,11 +13,12 @@ export class UsersService {
   ) {}
 
   async create(data: CreateUserDto): Promise<User> {
+    // NÃO passar array, só objeto
     const user = this.userRepository.create({
       email: data.email,
       password: data.password,
       name: data.name,
-      ...(data.avatarUrl && { avatarUrl: data.avatarUrl }),
+      avatarUrl: data.avatarUrl ?? null, // null permitido na entidade
     });
 
     return await this.userRepository.save(user);
@@ -33,19 +35,22 @@ export class UsersService {
   async getProfile(id: string): Promise<GetProfileOutputDto | null> {
     const user = await this.userRepository.findOne({
       where: { id },
-      // relations: { boards: { columns: true } }, // <- descomente quando tiver Board
+      relations: ['boards', 'boards.columns'], // garante que columns vêm junto
     });
 
     if (!user) return null;
 
-    const { name, email, avatarUrl } = user;
-
     return {
       id: user.id,
-      name,
-      email,
-      avatarUrl,
-      boards: [], // <- substituir quando a entidade `Board` estiver pronta
+      name: user.name,
+      email: user.email,
+      avatarUrl: user.avatarUrl ?? null,
+      boards:
+        user.boards?.map((board) => ({
+          id: board.id,
+          name: board.name,
+          columns: board.columns || [],
+        })) || [],
     };
   }
 }

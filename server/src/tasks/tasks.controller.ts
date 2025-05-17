@@ -1,13 +1,4 @@
-import {
-  Controller,
-  Post,
-  Get,
-  Put,
-  Delete,
-  Body,
-  Param,
-  ParseUUIDPipe,
-} from '@nestjs/common';
+import { Controller, Post, Get, Put, Delete, Body, Param, ParseUUIDPipe } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.input.dto';
 import { UpdateTaskInputDto } from './dto/update-task-status.dto';
@@ -33,10 +24,7 @@ export class TasksController {
   }
 
   @Put(':id')
-  async updateTask(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() data: UpdateTaskInputDto,
-  ) {
+  async updateTask(@Param('id', ParseUUIDPipe) id: string, @Body() data: UpdateTaskInputDto) {
     return this.tasksService.updateTask({ id, ...data });
   }
 
@@ -48,10 +36,7 @@ export class TasksController {
 
   // Atualizar ordem e coluna da task (drag and drop)
   @Put(':id/order')
-  async updateTaskOrder(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() data: UpdateTasksOrderDto,
-  ) {
+  async updateTaskOrder(@Param('id', ParseUUIDPipe) id: string, @Body() data: UpdateTasksOrderDto) {
     await this.tasksService.updateTaskOrder({ id, ...data });
     return { message: 'Task order updated successfully' };
   }

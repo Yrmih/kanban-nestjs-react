@@ -4,12 +4,13 @@ import { Repository, In, Not } from 'typeorm';
 
 import { CreateTaskDto } from './dto/create-task.input.dto';
 import { CreateTaskOutPutDto } from './dto/create-task-output.dto';
-import { GetTasksOutputDto } from './dto/get-tasks-output.dto';
+
 import { UpdateTaskInputDto } from './dto/update-task-status.dto';
 import { UpdateTasksOrderDto } from './dto/update-tasks-order';
 import { Task } from './task.entity';
 import { SubTask } from 'src/subtasks/subtask.entity';
 import { TaskMapper } from './task.mapper';
+import { TaskStatus } from './task-status.enum';
 
 @Injectable()
 export class TasksService {
@@ -19,24 +20,23 @@ export class TasksService {
 
     @InjectRepository(SubTask)
     private readonly subTaskRepository: Repository<SubTask>,
-  ) { }
+  ) {}
 
-  // cria task vinculando ao boardId (sem coluna)
   async createTask(data: CreateTaskDto): Promise<CreateTaskOutPutDto> {
     const { boardId, title, description, subTasks } = data;
 
-    // pegar última task do board para ordenar
     const lastTask = await this.taskRepository.findOne({
       where: { boardId },
-      order: { order: 'DESC' }
+      order: { order: 'DESC' },
     });
 
     const task = this.taskRepository.create({
-      name: title,
+      title,
       description,
       order: lastTask ? lastTask.order + 1 : 1,
       boardId,
-      subtasks: subTasks.map(st => this.subTaskRepository.create({ name: st.title }))
+      statusName: TaskStatus.TODO,
+      subTasks: subTasks?.map((st) => this.subTaskRepository.create({ title: st.title })) || [],
     });
 
     const taskCreated = await this.taskRepository.save(task);
@@ -44,55 +44,54 @@ export class TasksService {
     return TaskMapper.toHttpTask(taskCreated);
   }
 
-  // pega todas as tasks do board
-  async getTasks(boardId: string): Promise<GetTasksOutputDto[]> {
+  async getTasks(boardId: string): Promise<CreateTaskOutPutDto[]> {
     const tasks = await this.taskRepository.find({
       where: { boardId },
-      relations: ['subtasks'],
-      order: { order: 'ASC' }
+      relations: ['subTasks'],
+      order: { order: 'ASC' },
     });
 
     return tasks.map(TaskMapper.toHttpTask);
   }
 
-  // update da task
-  async updateTask(data: UpdateTaskInputDto & { id: string }): Promise<GetTasksOutputDto> {
+  // --- Método updateTask corrigido ---
+  async updateTask(data: UpdateTaskInputDto & { id: string }): Promise<CreateTaskOutPutDto> {
     const { id, boardId, title, description, subTasks } = data;
 
     const task = await this.taskRepository.findOne({
       where: { id },
-      relations: ['subtasks']
+      relations: ['subTasks'],
     });
     if (!task) throw new NotFoundException('Task not found');
 
-    // atualiza dados básicos
-    task.name = title;
-    task.description = description;
+    // Atualiza somente se o campo existir no DTO
+    if (title !== undefined) task.title = title;
+    if (description !== undefined) task.description = description;
+    if (boardId !== undefined) task.boardId = boardId;
 
-    // Se precisar atualizar boardId, ajusta aqui (se fizer sentido)
-    task.boardId = boardId;
+    const existingSubTaskIds = subTasks?.filter((st) => st.id).map((st) => st.id) || [];
 
-    // Filtrar subtasks que vieram na atualização
-    const existingSubTaskIds = subTasks
-      .filter((st) => st.id)
-      .map((st) => st.id);
+    // Deleta subtasks que não estão no array recebido
+    if (existingSubTaskIds.length > 0) {
+      await this.subTaskRepository.delete({
+        task: { id },
+        id: Not(In(existingSubTaskIds)),
+      });
+    } else {
+      // Se não tem subtasks no input, apaga todas
+      await this.subTaskRepository.delete({ task: { id } });
+    }
 
-    // Deletar subtasks que não estão no payload
-    await this.subTaskRepository.delete({
-      task: { id },
-      id: Not(In(existingSubTaskIds.length ? existingSubTaskIds : ['']))
-    });
-
-    // Atualizar e criar subtasks
-    for (const subTaskDto of subTasks) {
+    // Atualiza subtasks existentes ou cria novas
+    for (const subTaskDto of subTasks || []) {
       if (subTaskDto.id) {
-        // update
-        await this.subTaskRepository.update(subTaskDto.id, { name: subTaskDto.title });
+        await this.subTaskRepository.update(subTaskDto.id, {
+          title: subTaskDto.title,
+        });
       } else {
-        // create
         const newSubTask = this.subTaskRepository.create({
-          name: subTaskDto.title,
-          task
+          title: subTaskDto.title,
+          task,
         });
         await this.subTaskRepository.save(newSubTask);
       }
@@ -102,6 +101,7 @@ export class TasksService {
 
     return TaskMapper.toHttpTask(updatedTask);
   }
+  // --- Fim do método corrigido ---
 
   async deleteTask(id: string): Promise<void> {
     const task = await this.taskRepository.findOne({ where: { id } });
@@ -110,37 +110,32 @@ export class TasksService {
     await this.taskRepository.delete(id);
   }
 
-  // atualizar ordem da task dentro do mesmo board (sem coluna)
   async updateTaskOrder({
     id,
     newOrder,
-    boardId
+    boardId,
   }: UpdateTasksOrderDto & { id: string }): Promise<void> {
     const task = await this.taskRepository.findOne({ where: { id } });
     if (!task) throw new NotFoundException('Task not found');
 
     if (task.order === newOrder) return;
 
-    // pega todas as tasks do board que estão entre as ordens
     const minOrder = Math.min(task.order, newOrder);
     const maxOrder = Math.max(task.order, newOrder);
 
     const tasksToUpdate = await this.taskRepository.find({
       where: {
         boardId,
-        order: In(Array.from({ length: maxOrder - minOrder + 1 }, (_, i) => i + minOrder))
-      }
+        order: In(Array.from({ length: maxOrder - minOrder + 1 }, (_, i) => i + minOrder)),
+      },
     });
 
-    // reajusta a ordem das tasks
     for (const t of tasksToUpdate) {
       if (t.id === id) {
         t.order = newOrder;
       } else if (task.order < newOrder) {
-        // task foi pra frente => decrementa as outras
         if (t.order > task.order && t.order <= newOrder) t.order--;
       } else {
-        // task foi pra trás => incrementa as outras
         if (t.order < task.order && t.order >= newOrder) t.order++;
       }
     }
@@ -148,28 +143,27 @@ export class TasksService {
     await this.taskRepository.save(tasksToUpdate);
   }
 
-  // Pega tasks por board e retorna mapeado
-  async getTasksFromBoard(boardId: string): Promise<GetTasksOutputDto[]> {
+  async getTasksFromBoard(boardId: string): Promise<CreateTaskOutPutDto[]> {
     const tasks = await this.taskRepository.find({
       where: { boardId },
-      relations: ['subtasks'],
-      order: { order: 'ASC' }
+      relations: ['subTasks'],
+      order: { order: 'ASC' },
     });
 
     return tasks.map(TaskMapper.toHttpTask);
   }
 
-  // Muda status da task alterando o boardId e colocando a task no final da lista
-  async changeStatusTask(taskId: string, boardId: string): Promise<void> {
+  async changeStatusTask(taskId: string, boardId: string, columnId?: string): Promise<void> {
     const task = await this.taskRepository.findOne({ where: { id: taskId } });
     if (!task) throw new NotFoundException('Task not found');
 
     const lastTask = await this.taskRepository.findOne({
       where: { boardId },
-      order: { order: 'DESC' }
+      order: { order: 'DESC' },
     });
 
     task.boardId = boardId;
+    task.columnId = columnId ?? task.columnId;
     task.order = lastTask ? lastTask.order + 1 : 1;
 
     await this.taskRepository.save(task);

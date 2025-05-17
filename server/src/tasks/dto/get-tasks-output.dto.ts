@@ -1,15 +1,11 @@
-export interface GetTasksOutputDto {
+export interface CreateTaskOutPutDto {
   id: string;
-  columnId: string;
   title: string;
-  statusName: string;
-  order: number;
-  description: string | null;
-  createdAt: string;
-  updatedAt: string;
-  subTasks: {
+  description?: string | null;
+  boardId: string;
+  subTasks: Array<{
     id: string;
     title: string;
     isDone: boolean;
-  }[];
+  }>;
 }

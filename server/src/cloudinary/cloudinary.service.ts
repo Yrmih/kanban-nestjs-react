@@ -1,6 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { v2 as cloudinary } from 'cloudinary';
+import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 
 @Injectable()
 export class CloudinaryService {
@@ -8,7 +8,7 @@ export class CloudinaryService {
 
   constructor(private readonly configService: ConfigService) {}
 
-  public async uploadImage(file: Express.Multer.File): Promise<any> {
+  public async uploadImage(file: Express.Multer.File): Promise<UploadApiResponse> {
     if (!file) {
       throw new InternalServerErrorException('File is required');
     }
@@ -33,14 +33,11 @@ export class CloudinaryService {
   }
 
   private transformFileToUpload(file: Express.Multer.File): string {
-    if (!file)
-      throw new InternalServerErrorException('File is undefined or null');
+    if (!file) throw new InternalServerErrorException('File is undefined or null');
 
     const buffer = file.buffer;
     if (!(buffer instanceof Buffer)) {
-      throw new InternalServerErrorException(
-        'File buffer is missing or invalid',
-      );
+      throw new InternalServerErrorException('File buffer is missing or invalid');
     }
 
     const base64Image = buffer.toString('base64');
@@ -48,8 +45,7 @@ export class CloudinaryService {
   }
 
   private extractFileExtension(file: Express.Multer.File): string {
-    if (!file)
-      throw new InternalServerErrorException('File is undefined or null');
+    if (!file) throw new InternalServerErrorException('File is undefined or null');
 
     const mimetype = file.mimetype;
     if (typeof mimetype !== 'string') {

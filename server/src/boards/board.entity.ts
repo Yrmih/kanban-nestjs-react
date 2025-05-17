@@ -1,4 +1,3 @@
-// src/boards/board.entity.ts
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -23,15 +22,14 @@ export class Board {
   @Column()
   userId: string;
 
+  // Aqui, colunas armazenadas como JSON (array de objetos com id e name)
   @Column('jsonb', { nullable: true })
   columns?: { id: string; name: string }[];
-
-  @Column({ nullable: true })
-  coverUrl?: string; // <- nova coluna para armazenar a imagem da capa
 
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
+  coverUrl: string;
 }

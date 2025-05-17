@@ -32,6 +32,7 @@ export class SubtasksService {
     // Aqui você mapeia o retorno para o formato que o DTO exige
     return {
       id: updatedSubTask.id,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       name: updatedSubTask.name, // garante que isso exista na entidade SubTask
       isDone: updatedSubTask.isDone,
     };
