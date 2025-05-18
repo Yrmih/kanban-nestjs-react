@@ -1,14 +1,13 @@
+// vite.config.ts
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import svgr from 'vite-plugin-svgr';
-import path from 'path';
-import tailwindcss from '@tailwindcss/vite'; // ✅ importa o plugin do Tailwind
+import path from 'node:path';
 
 export default defineConfig({
   plugins: [
+    svgr(), // sem exportAsDefault
     react(),
-    svgr(),
-    tailwindcss(), // ✅ adiciona aqui
   ],
   resolve: {
     alias: {
