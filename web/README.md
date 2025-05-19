@@ -1,54 +1,83 @@
-# React + TypeScript + Vite
+# Desafio Fullstack - Quadro Kanban
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> Aplicação fullstack com NestJS + PostgreSQL no backend e ReactJS + Vite no frontend. Desenvolvido como parte de um desafio técnico para avaliação de habilidades de desenvolvimento web completo.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Sobre o Projeto
 
-## Expanding the ESLint configuration
+Este projeto é um quadro Kanban com funcionalidades completas de CRUD, permitindo que usuários:
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Criem tarefas  
+- Atualizem descrições e status  
+- Arrastem tarefas entre colunas (drag and drop)  
+- Removam tarefas  
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+---
+
+## Tecnologias Utilizadas
+
+### Backend
+
+- NestJS  
+- TypeORM  
+- PostgreSQL (utilizando Railway)  
+- TypeScript  
+
+### Frontend
+
+- ReactJS  
+- Vite  
+- TypeScript  
+- Material UI (MUI)  
+- react-beautiful-dnd (para drag and drop)  
+
+---
+
+## Estrutura do Projeto
+
+```bash
+.
+├── server/         # Backend (NestJS)
+├── web/            # Frontend (React + Vite)
+└── README.md
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Funcionalidades Implementadas
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+- Listagem de tarefas  
+- Criação de tarefas com título e descrição  
+- Edição e exclusão de tarefas  
+- Alteração de status: `pending`, `in_progress`, `testing`, `done`  
+- Interface responsiva e intuitiva  
+- Organização por colunas no estilo Kanban  
+- Arrastar e soltar tarefas entre colunas  
+
+---
+
+## Requisitos Técnicos Atendidos
+
+- NestJS com PostgreSQL  
+- Integração com Railway usando TypeORM  
+- Organização modular no backend  
+- ReactJS com Vite e TypeScript no frontend  
+- Componentização e boas práticas  
+- Código limpo, organizado e versionado com git  
+
+---
+
+## Comandos Úteis
+
+| Comando            | Descrição                            |
+|--------------------|----------------------------------------|
+| `npm run dev`       | Inicia o frontend em modo desenvolvimento |
+| `npm run start:dev` | Inicia o backend em modo desenvolvimento  |
+
+---
+
+## Considerações Finais
+
+Este desafio foi desenvolvido com foco em boas práticas, organização e entrega eficiente.  
+Sinta-se à vontade para clonar, testar e sugerir melhorias.
