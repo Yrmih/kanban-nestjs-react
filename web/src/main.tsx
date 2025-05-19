@@ -1,13 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { RouterProvider } from 'react-router-dom';
+import App from './App';
+import { CssBaseline, ThemeProvider } from '@mui/material';
+import theme from './styles/theme';
+import './styles/global.css';
 
-import { router } from './routes';
-
-import './shared/styles/globals.css'
-
-ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-	<React.StrictMode>
-		<RouterProvider router={router} />
-	</React.StrictMode>
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <App />
+    </ThemeProvider>
+  </React.StrictMode>
 );

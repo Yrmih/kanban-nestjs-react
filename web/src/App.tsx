@@ -1,13 +1,15 @@
 
-import { Outlet } from 'react-router-dom';
+import { TaskProvider } from './context/TaskContext';
+import Board from './components/Board/Board';
+import Header from './components/Header';
 
-import { AppProviders } from './shared/components/AppProviders';
-
-export function App() {
+const App = () => {
   return (
-    <AppProviders>
-      {/* Botão removido */}
-      <Outlet />
-    </AppProviders>
+    <TaskProvider>
+      <Header />
+      <Board />
+    </TaskProvider>
   );
-}
+};
+
+export default App;
