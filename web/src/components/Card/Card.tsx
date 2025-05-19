@@ -13,12 +13,11 @@ interface CardProps {
   onDelete: (id: string) => void;
 }
 
-// cores diferentes para cada status (exemplo)
 const headerColors: Record<Task['status'], string> = {
-  pending: '#f44336', // vermelho
-  in_progress: '#2196f3', // azul
-  testing: '#ff9800', // laranja
-  done: '#4caf50', // verde
+  pending: '#f44336',       // vermelho
+  in_progress: '#2196f3',   // azul
+  testing: '#ff9800',       // laranja
+  done: '#4caf50',          // verde
 };
 
 const Card = ({ task, onEdit, onDelete }: CardProps) => {
@@ -30,34 +29,36 @@ const Card = ({ task, onEdit, onDelete }: CardProps) => {
     transition,
   } = useSortable({ id: task.id });
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
+  const style: React.CSSProperties = {
+    transform: transform ? CSS.Transform.toString(transform) : undefined,
     transition,
-    marginBottom: '8px',
+    marginBottom: 12,
     backgroundColor: '#fff',
-    borderRadius: '4px',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    borderRadius: 8,
+    boxShadow: '0 4px 8px rgba(0,0,0,0.12)',
     cursor: 'grab',
     userSelect: 'none',
+    display: 'flex',
+    flexDirection: 'column',
   };
 
   return (
     <Box ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      {/* Cabeçalho colorido */}
       <Box
         sx={{
           backgroundColor: headerColors[task.status],
-          borderTopLeftRadius: 4,
-          borderTopRightRadius: 4,
-          padding: '4px 8px',
+          borderTopLeftRadius: 8,
+          borderTopRightRadius: 8,
+          padding: '8px 12px',
           color: '#fff',
           fontWeight: 'bold',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
+          boxShadow: 'inset 0 -2px 4px rgba(0,0,0,0.15)',
         }}
       >
-        <Typography variant="subtitle1" sx={{ userSelect: 'none' }}>
+        <Typography variant="subtitle1" sx={{ userSelect: 'none', fontWeight: 600 }}>
           {task.title}
         </Typography>
         <Box>
@@ -69,6 +70,7 @@ const Card = ({ task, onEdit, onDelete }: CardProps) => {
             }}
             aria-label="editar tarefa"
             color="inherit"
+            sx={{ color: 'rgba(255,255,255,0.9)' }}
           >
             <EditIcon fontSize="small" />
           </IconButton>
@@ -80,21 +82,21 @@ const Card = ({ task, onEdit, onDelete }: CardProps) => {
             }}
             aria-label="excluir tarefa"
             color="inherit"
+            sx={{ color: 'rgba(255,255,255,0.9)' }}
           >
             <DeleteIcon fontSize="small" />
           </IconButton>
           <DragIndicatorIcon
             fontSize="small"
-            sx={{ ml: 1, cursor: 'grab', color: '#fff' }}
+            sx={{ ml: 1, cursor: 'grab', color: 'rgba(255,255,255,0.9)' }}
             aria-label="arrastar tarefa"
           />
         </Box>
       </Box>
 
-      {/* Descrição da task */}
       {task.description && (
-        <Box sx={{ padding: '8px' }}>
-          <Typography variant="body2" color="text.secondary">
+        <Box sx={{ padding: '12px 16px', color: 'text.secondary' }}>
+          <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
             {task.description}
           </Typography>
         </Box>

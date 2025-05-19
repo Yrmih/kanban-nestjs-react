@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, MenuItem } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -37,6 +38,15 @@ const TaskForm = ({ open, onClose, taskToEdit }: TaskFormProps) => {
     },
   });
 
+  // Reseta o formulário toda vez que taskToEdit mudar
+  useEffect(() => {
+    reset({
+      title: taskToEdit?.title ?? '',
+      description: taskToEdit?.description ?? '',
+      status: taskToEdit?.status ?? 'pending',
+    });
+  }, [taskToEdit, reset]);
+
   const onSubmit = (data: FormData) => {
     if (taskToEdit) {
       updateTask({ ...taskToEdit, ...data });
@@ -51,8 +61,14 @@ const TaskForm = ({ open, onClose, taskToEdit }: TaskFormProps) => {
     onClose();
   };
 
+  // Limpa o formulário e fecha o modal
+  const handleClose = () => {
+    reset();
+    onClose();
+  };
+
   return (
-    <Dialog open={open} onClose={onClose} fullWidth>
+    <Dialog open={open} onClose={handleClose} fullWidth>
       <DialogTitle>{taskToEdit ? 'Editar Tarefa' : 'Nova Tarefa'}</DialogTitle>
 
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -88,7 +104,7 @@ const TaskForm = ({ open, onClose, taskToEdit }: TaskFormProps) => {
         </DialogContent>
 
         <DialogActions>
-          <Button onClick={onClose}>Cancelar</Button>
+          <Button onClick={handleClose}>Cancelar</Button>
           <Button type="submit" variant="contained">
             {taskToEdit ? 'Salvar Alterações' : 'Criar Tarefa'}
           </Button>
