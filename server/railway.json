@@ -1,0 +1,11 @@
+{
+  "services": [
+    {
+      "name": "kanban-nestjs-react",
+      "root": "server",
+      "build": {
+        "builder": "dockerfile"
+      }
+    }
+  ]
+}
