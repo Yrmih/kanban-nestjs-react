@@ -10,7 +10,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
-        url: configService.get<string>('DATABASE_PUBLIC_URL'),
+        url: configService.get<string>('DATABASE_URL'),
         entities: [__dirname + '/../**/*.entity{.ts,.js}'],
         // NÃO use synchronize quando for usar migrations, para evitar perder dados
         // synchronize: false,
