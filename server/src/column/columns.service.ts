@@ -1,14 +1,31 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Columns } from './columns.entity';
 
 @Injectable()
-export class ColumnsService {
+export class ColumnsService implements OnModuleInit {
   constructor(
     @InjectRepository(Columns)
     private columnsRepository: Repository<Columns>,
   ) {}
+
+  private defaultColumns = ['todo', 'processing', 'done', 'backlogged'];
+
+  async onModuleInit() {
+    const existingColumns = await this.columnsRepository.find();
+    const existingTitles = existingColumns.map((col) => col.title);
+
+    const missingColumns = this.defaultColumns.filter((title) => !existingTitles.includes(title));
+
+    if (missingColumns.length > 0) {
+      const newColumns = missingColumns.map((title) => this.columnsRepository.create({ title }));
+      await this.columnsRepository.save(newColumns);
+      console.log(`Colunas criadas: ${missingColumns.join(', ')}`);
+    } else {
+      console.log('Todas as colunas padrão já existem no banco');
+    }
+  }
 
   findAll(): Promise<Columns[]> {
     return this.columnsRepository.find({ relations: ['tasks'] });

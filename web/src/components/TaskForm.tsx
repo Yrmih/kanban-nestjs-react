@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -15,10 +15,13 @@ import { z } from 'zod';
 import { useTasks } from '../context/TaskContext';
 import type { Task } from '../context/TaskContext';
 
-// Esquema de validação
+import { getColumns } from '../services/taskService';
+
+// Validação do formulário (incluindo status e columnId)
 const schema = z.object({
   title: z.string().min(1, 'Título obrigatório'),
   description: z.string().optional(),
+  columnId: z.number(),
   status: z.enum(['pending', 'in_progress', 'testing', 'done']),
 });
 
@@ -30,16 +33,14 @@ interface TaskFormProps {
   taskToEdit: Task | null;
 }
 
-// Mapeamento de status para columnId
-const statusToColumnIdMap = {
-  pending: 1,
-  in_progress: 2,
-  testing: 3,
-  done: 4,
-} as const;
+interface Column {
+  id: number;
+  title: string;
+}
 
 const TaskForm = ({ open, onClose, taskToEdit }: TaskFormProps) => {
   const { addTask, updateTask } = useTasks();
+  const [columns, setColumns] = useState<Column[]>([]);
 
   const {
     register,
@@ -51,42 +52,56 @@ const TaskForm = ({ open, onClose, taskToEdit }: TaskFormProps) => {
     defaultValues: {
       title: '',
       description: '',
-      status: 'pending',
+      columnId: 1,    // default para a primeira coluna
+      status: 'pending', // default para status
     },
   });
 
-  // Preenche o formulário se estiver editando
+  // Busca colunas do backend quando o modal abre
+  useEffect(() => {
+    const fetchColumns = async () => {
+      try {
+        const cols = await getColumns();
+        setColumns(cols);
+      } catch (err) {
+        console.error('Erro ao buscar colunas', err);
+      }
+    };
+
+    if (open) fetchColumns();
+  }, [open]);
+
+  // Se estiver editando, preencher formulário com dados da tarefa
   useEffect(() => {
     if (taskToEdit) {
       reset({
         title: taskToEdit.title ?? '',
         description: taskToEdit.description ?? '',
+        columnId: taskToEdit.columnId ?? 1,
         status: taskToEdit.status ?? 'pending',
       });
     } else {
       reset({
         title: '',
         description: '',
+        columnId: 1,
         status: 'pending',
       });
     }
   }, [taskToEdit, reset]);
 
-  // Submissão do formulário com columnId baseado no status
+  // Enviar formulário: chama addTask ou updateTask com todos os dados necessários
   const onSubmit = async (data: FormData) => {
-    const columnId = statusToColumnIdMap[data.status];
-    const taskPayload = { ...data, columnId };
-
     if (taskToEdit) {
-      await updateTask({ ...taskToEdit, ...taskPayload });
+      await updateTask({ ...taskToEdit, ...data });
     } else {
-      await addTask(taskPayload);
+      await addTask(data);
     }
-
     reset();
     onClose();
   };
 
+  // Fecha o modal e reseta o form
   const handleClose = () => {
     reset();
     onClose();
@@ -114,7 +129,31 @@ const TaskForm = ({ open, onClose, taskToEdit }: TaskFormProps) => {
             fullWidth
           />
 
-          <TextField select label="Status" {...register('status')} fullWidth>
+          {/* Select dinâmico para colunas */}
+          <TextField
+            select
+            label="Coluna"
+            {...register('columnId', { valueAsNumber: true })}
+            fullWidth
+            error={!!errors.columnId}
+            helperText={errors.columnId?.message}
+          >
+            {columns.map((col) => (
+              <MenuItem key={col.id} value={col.id}>
+                {col.title}
+              </MenuItem>
+            ))}
+          </TextField>
+
+          {/* Select para status da tarefa */}
+          <TextField
+            select
+            label="Status"
+            {...register('status')}
+            fullWidth
+            error={!!errors.status}
+            helperText={errors.status?.message}
+          >
             <MenuItem value="pending">Pendente</MenuItem>
             <MenuItem value="in_progress">Em progresso</MenuItem>
             <MenuItem value="testing">Testando</MenuItem>

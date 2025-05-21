@@ -1,11 +1,8 @@
-// context/TaskContext.tsx
-
 import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { toast } from 'react-hot-toast';
 import * as taskService from '../services/taskService';
 
-// Aqui, não usamos columnId no frontend, só status para filtrar e organizar
 export type TaskStatus = 'pending' | 'in_progress' | 'testing' | 'done';
 
 export interface Task {
@@ -13,7 +10,7 @@ export interface Task {
   title: string;
   description?: string;
   status: TaskStatus;
-  // columnId foi removido aqui, pois não usamos no frontend, só no backend
+  columnId: number; 
 }
 
 interface TaskContextType {
@@ -32,8 +29,14 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
   const fetchTasks = async () => {
     try {
       const data = await taskService.getTasks();
-      // Se quiser, pode mapear para remover columnId e deixar só o status aqui
-      setTasks(data.map(({id, title, description, status}) => ({ id, title, description, status })));
+      // Mapear incluindo columnId e status
+      setTasks(data.map(({ id, title, description, status, columnId }) => ({
+        id,
+        title,
+        description,
+        status,
+        columnId,
+      })));
     } catch (error) {
       console.error('fetchTasks:', error);
       toast.error('Erro ao carregar tarefas');
@@ -43,7 +46,13 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
   const addTask = async (task: Omit<Task, 'id'>) => {
     try {
       const newTask = await taskService.createTask(task);
-      setTasks(prev => [...prev, { id: newTask.id, title: newTask.title, description: newTask.description, status: newTask.status }]);
+      setTasks(prev => [...prev, {
+        id: newTask.id,
+        title: newTask.title,
+        description: newTask.description,
+        status: newTask.status,
+        columnId: newTask.columnId,
+      }]);
       toast.success('Tarefa adicionada com sucesso!');
     } catch (error) {
       console.error('addTask:', error);
@@ -54,7 +63,19 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
   const updateTask = async (task: Task) => {
     try {
       const updatedTask = await taskService.updateTask(task.id, task);
-      setTasks(prev => prev.map(t => (t.id === updatedTask.id ? { id: updatedTask.id, title: updatedTask.title, description: updatedTask.description, status: updatedTask.status } : t)));
+      setTasks(prev =>
+        prev.map(t =>
+          t.id === updatedTask.id
+            ? {
+                id: updatedTask.id,
+                title: updatedTask.title,
+                description: updatedTask.description,
+                status: updatedTask.status,
+                columnId: updatedTask.columnId,
+              }
+            : t
+        )
+      );
       toast.success('Tarefa atualizada com sucesso!');
     } catch (error) {
       console.error('updateTask:', error);

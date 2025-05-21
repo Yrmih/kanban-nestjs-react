@@ -1,87 +1,73 @@
-<h1 align="center">🚀 Desafio Fullstack - Quadro Kanban</h1>
+# Fullstack Kanban App
 
-<p align="center">
-  <b>Aplicação Fullstack com NestJS + PostgreSQL no backend e ReactJS + Vite no frontend.</b><br/>
-  Desenvolvido como parte de um desafio técnico para avaliação de habilidades de desenvolvimento web completo.
-</p>
-
-<p align="center">
-  <img src="https://img.shields.io/badge/Stack-Fullstack-blueviolet?style=for-the-badge" />
-  <img src="https://img.shields.io/badge/NestJS-E0234E?style=for-the-badge&logo=nestjs&logoColor=white" />
-  <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" />
-  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" />
-  <img src="https://img.shields.io/badge/PostgreSQL-336791?style=for-the-badge&logo=postgresql&logoColor=white" />
-</p>
+Sistema completo de gerenciamento de tarefas estilo **Kanban**, com backend em **NestJS** e frontend em **React + Vite**. A aplicação utiliza **PostgreSQL** via **Docker Compose**, e traz uma stack moderna com foco em produtividade, tipagem forte e boas práticas.
 
 ---
 
-## 📌 Sobre o Projeto
+## Stacks e Tecnologias
 
-Este projeto é um quadro **Kanban** com funcionalidades completas de **CRUD**, permitindo que usuários:
+### Frontend (`/client`)
+- **React** – v18.2+
+- **Vite** – v5+
+- **TypeScript** – v5.4+
+- **Material UI (MUI)** – v5+
+- **Zustand** – v4+
+- **React Hook Form** – v7+
+- **Zod** – v3+
+- **Axios** – v1+
+- **React Query (TanStack Query)** – v5+
 
-- Criem tarefas  
-- Atualizem descrições e status  
-- Arrastem tarefas entre colunas (drag and drop)  
-- Removam tarefas  
-
----
-
-## 🛠 Tecnologias Utilizadas
-
-### 🔧 Backend
-
-- **NestJS**
-- **TypeORM**
-- **PostgreSQL** (utilizando Railway)
-- **TypeScript**
-
-### 💻 Frontend
-
-- **ReactJS**
-- **Vite**
-- **TypeScript**
-- **Material UI (MUI)**
-- **react-beautiful-dnd** (para drag and drop)
+### 🛠 Backend (`/server`)
+- **NestJS** – v10+
+- **TypeScript** – v5.4+
+- **TypeORM** – v0.3+
+- **PostgreSQL** – via Docker Compose
+- **Docker & Docker Compose**
 
 ---
 
-## 📁 Estrutura do Projeto
+## Estrutura do Projeto
 
 ```bash
-.
-├── server/         # Backend (NestJS)
-├── web/            # Frontend (React + Vite)
-└── README.md
-✅ Funcionalidades Implementadas:
-Listagem de tarefas
+root
+├── server        # Backend NestJS
+└── web           # Frontend React + Vite
 
-Criação de tarefas com título e descrição
+## Clonar o repositório
 
-Edição e exclusão de tarefas
+git clone https://github.com/seu-usuario/kanban-app.git
+cd kanban-app
 
-Alteração de status: pending, in_progress, testing, done
+## Criar o arquivo .env dentro da pasta server
+# .env (server/.env)
 
-Interface responsiva e intuitiva
+DATABASE_URL=postgres://<user-banco-exemplo:senha>@localhost:5432/<Seu_banco>
+CLIENT_URL=http://localhost:5173
+PORT=3000
 
-Organização por colunas no estilo Kanban
+⚠️ O projeto usa synchronize: true no TypeORM, o que cria automaticamente as tabelas com base nas entidades. Isso é ideal para desenvolvimento, mas NÃO deve ser usado em produção, pois pode apagar dados.
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-Arrastar e soltar tarefas entre colunas
-📦 Requisitos Técnicos Atendidos:
+🛠 Rodando o Backend
 
-NestJS com PostgreSQL
-
-Integração com Railway usando TypeORM
-
-Organização modular no backend
-
-ReactJS com Vite e TypeScript no frontend
-
-Componentização e boas práticas
-
-Código limpo, organizado e versionado com git
-
-Comandos:
-npm run dev
+cd server
+npm install
 npm run start:dev
 
+💻 Rodando o Frontend
+
+cd web
+npm install
+npm run dev
+
+
+#Nota para produção:
+
+# synchronize: true
+
+#Isso é ótimo para desenvolvimento e testes, mas não é usado em produção, porque:
+
+#Se você mudar uma entidade sem querer, o TypeORM pode deletar ou recriar tabelas.
+
+#Em produção, o ideal é usar migrations controladas, com typeorm migration:generate e run.
 
