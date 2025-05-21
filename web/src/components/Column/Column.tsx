@@ -1,3 +1,4 @@
+import React from 'react';
 import { Box, Typography } from '@mui/material';
 import { useDroppable } from '@dnd-kit/core';
 
@@ -21,11 +22,10 @@ const statusLabels: Record<Task['status'], string> = {
 const Column = ({ status, tasks, onEditTask, onDeleteTask }: ColumnProps) => {
   const { isOver, setNodeRef } = useDroppable({ id: status });
 
-  // Para debug: veja se existe algum task inválido
-  // console.log('Tasks in column:', tasks);
-
-  // Filtra tasks inválidas para evitar crash
-  const validTasks = tasks.filter((task): task is Task => task !== undefined && task !== null);
+  const validTasks = React.useMemo(() =>
+    tasks.filter((task): task is Task => task !== undefined && task !== null),
+    [tasks]
+  );
 
   return (
     <Box

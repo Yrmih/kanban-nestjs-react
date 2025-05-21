@@ -23,6 +23,7 @@ const statuses = ['pending', 'in_progress', 'testing', 'done'] as const;
 
 const Board = () => {
   const { tasks, updateTask, deleteTask } = useTasks();
+
   const [openForm, setOpenForm] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
 
@@ -70,19 +71,15 @@ const Board = () => {
     }),
   );
 
-  const onDragEnd = (event: DragEndEvent) => {
+  const onDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over) return;
 
     const activeId = active.id as string;
     const overId = over.id as string;
 
-    const activeContainer = active.data.current?.sortable.containerId as
-      | Task['status']
-      | undefined;
-    const overContainer = over.data.current?.sortable.containerId as
-      | Task['status']
-      | undefined;
+    const activeContainer = active.data?.current?.sortable?.containerId as Task['status'] | undefined;
+    const overContainer = over.data?.current?.sortable?.containerId as Task['status'] | undefined;
 
     if (!activeContainer || !overContainer) return;
 
@@ -103,11 +100,9 @@ const Board = () => {
         const oldItems = [...prev[activeContainer]];
         const newItems = [...prev[overContainer]];
 
-      
         const oldIndex = oldItems.indexOf(activeId);
         if (oldIndex > -1) oldItems.splice(oldIndex, 1);
 
-        
         newItems.push(activeId);
 
         return {
@@ -117,11 +112,15 @@ const Board = () => {
         };
       });
 
-      
-      updateTask({
-        ...(tasks.find((t) => t.id === activeId) as Task),
-        status: overContainer,
-      });
+      try {
+        await updateTask({
+          ...(tasks.find((t) => t.id === activeId) as Task),
+          status: overContainer,
+        });
+      } catch (error) {
+        console.error('Erro ao atualizar tarefa:', error);
+        // opcional: reverter estado ou alertar usuário
+      }
     }
   };
 
@@ -136,8 +135,23 @@ const Board = () => {
 
   return (
     <>
-      <Box sx={{ p: 2, mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h4" color="primary" fontWeight={700} display="flex" alignItems="center" gap={1}>
+      <Box
+        sx={{
+          p: 2,
+          mb: 2,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
+        <Typography
+          variant="h4"
+          color="primary"
+          fontWeight={700}
+          display="flex"
+          alignItems="center"
+          gap={1}
+        >
           <Dashboard fontSize="large" />
           Quadro de Tarefas
         </Typography>
@@ -147,11 +161,7 @@ const Board = () => {
         </Button>
       </Box>
 
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={onDragEnd}
-      >
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
         <Box
           sx={{
             display: 'flex',
@@ -168,8 +178,8 @@ const Board = () => {
             >
               <Column
                 status={status}
-                tasks={itemsByStatus[status].map((id) =>
-                  tasks.find((task) => task.id === id) as Task,
+                tasks={itemsByStatus[status].map(
+                  (id) => tasks.find((task) => task.id === id) as Task,
                 )}
                 onEditTask={handleEdit}
                 onDeleteTask={handleDelete}

@@ -1,18 +1,18 @@
-import 'dotenv/config';
 import { DataSource } from 'typeorm';
+import { Task } from '../task/task.entity';
+import { Columns } from '../column/columns.entity';
+import * as dotenv from 'dotenv';
 
-import { User } from '../user/user.entity';
-import { Board } from '../boards/board.entity';
-import { Task } from '../tasks/task.entity';
-import { SubTask } from '../subtasks/subtask.entity';
-import { RefreshToken } from '../refresh-token/refresh-token.entity';
+dotenv.config();
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
-  url: process.env.DATABASE_URL,
-  synchronize: false, // migrations são para isso
-  logging: true,
-  entities: [User, Board, Task, SubTask, RefreshToken],
-  migrations: ['src/database/migrations/*.ts'], // <-- caminho para as migrations
-  migrationsRun: false, // controla se executa migrations automaticamente (geralmente false)
+  host: process.env.DB_HOST || 'localhost',
+  port: parseInt(process.env.DB_PORT || '5432'),
+  username: process.env.DB_USERNAME || 'postgres',
+  password: process.env.DB_PASSWORD || 'admin123',
+  database: process.env.DB_NAME || 'kanban_db',
+  entities: [Task, Columns],
+  migrations: ['src/migrations/*{.ts,.js}'],
+  synchronize: false,
 });

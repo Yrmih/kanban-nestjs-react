@@ -1,12 +1,21 @@
 import { useEffect } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, MenuItem } from '@mui/material';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+  MenuItem,
+} from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { v4 as uuidv4 } from 'uuid';
 
-import { useTasks, type Task } from '../context/TaskContext';
+import { useTasks } from '../context/TaskContext';
+import type { Task } from '../context/TaskContext';
 
+// Esquema de validação
 const schema = z.object({
   title: z.string().min(1, 'Título obrigatório'),
   description: z.string().optional(),
@@ -21,6 +30,14 @@ interface TaskFormProps {
   taskToEdit: Task | null;
 }
 
+// Mapeamento de status para columnId
+const statusToColumnIdMap = {
+  pending: 1,
+  in_progress: 2,
+  testing: 3,
+  done: 4,
+} as const;
+
 const TaskForm = ({ open, onClose, taskToEdit }: TaskFormProps) => {
   const { addTask, updateTask } = useTasks();
 
@@ -32,36 +49,44 @@ const TaskForm = ({ open, onClose, taskToEdit }: TaskFormProps) => {
   } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
-      title: taskToEdit?.title ?? '',
-      description: taskToEdit?.description ?? '',
-      status: taskToEdit?.status ?? 'pending',
+      title: '',
+      description: '',
+      status: 'pending',
     },
   });
 
-  // Reseta o formulário toda vez que taskToEdit mudar
+  // Preenche o formulário se estiver editando
   useEffect(() => {
-    reset({
-      title: taskToEdit?.title ?? '',
-      description: taskToEdit?.description ?? '',
-      status: taskToEdit?.status ?? 'pending',
-    });
+    if (taskToEdit) {
+      reset({
+        title: taskToEdit.title ?? '',
+        description: taskToEdit.description ?? '',
+        status: taskToEdit.status ?? 'pending',
+      });
+    } else {
+      reset({
+        title: '',
+        description: '',
+        status: 'pending',
+      });
+    }
   }, [taskToEdit, reset]);
 
-  const onSubmit = (data: FormData) => {
+  // Submissão do formulário com columnId baseado no status
+  const onSubmit = async (data: FormData) => {
+    const columnId = statusToColumnIdMap[data.status];
+    const taskPayload = { ...data, columnId };
+
     if (taskToEdit) {
-      updateTask({ ...taskToEdit, ...data });
+      await updateTask({ ...taskToEdit, ...taskPayload });
     } else {
-      const newTask: Task = {
-        id: uuidv4(),
-        ...data,
-      };
-      addTask(newTask);
+      await addTask(taskPayload);
     }
+
     reset();
     onClose();
   };
 
-  // Limpa o formulário e fecha o modal
   const handleClose = () => {
     reset();
     onClose();
@@ -89,13 +114,7 @@ const TaskForm = ({ open, onClose, taskToEdit }: TaskFormProps) => {
             fullWidth
           />
 
-          <TextField
-            select
-            label="Status"
-            defaultValue={taskToEdit?.status ?? 'pending'}
-            {...register('status')}
-            fullWidth
-          >
+          <TextField select label="Status" {...register('status')} fullWidth>
             <MenuItem value="pending">Pendente</MenuItem>
             <MenuItem value="in_progress">Em progresso</MenuItem>
             <MenuItem value="testing">Testando</MenuItem>

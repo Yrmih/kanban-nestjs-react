@@ -27,30 +27,36 @@ const Card = ({ task, onEdit, onDelete }: CardProps) => {
     setNodeRef,
     transform,
     transition,
-  } = useSortable({ id: task.id });
+  } = useSortable({ id: task.id }); 
 
-  const style: React.CSSProperties = {
+  const style = {
     transform: transform ? CSS.Transform.toString(transform) : undefined,
     transition,
-    marginBottom: 12,
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    boxShadow: '0 4px 8px rgba(0,0,0,0.12)',
-    cursor: 'grab',
-    userSelect: 'none',
-    display: 'flex',
-    flexDirection: 'column',
   };
 
   return (
-    <Box ref={setNodeRef} style={style} {...attributes} {...listeners}>
+    <Box
+      component="article"
+      ref={setNodeRef}
+      sx={{
+        mb: 1.5,
+        bgcolor: 'background.paper',
+        borderRadius: 1,
+        boxShadow: 2,
+        userSelect: 'none',
+        display: 'flex',
+        flexDirection: 'column',
+        ...style,
+      }}
+      // Não passa attributes/listeners aqui para evitar drag indesejado
+    >
       <Box
         sx={{
           backgroundColor: headerColors[task.status],
           borderTopLeftRadius: 8,
           borderTopRightRadius: 8,
-          padding: '8px 12px',
-          color: '#fff',
+          p: 1,
+          color: 'common.white',
           fontWeight: 'bold',
           display: 'flex',
           justifyContent: 'space-between',
@@ -58,9 +64,13 @@ const Card = ({ task, onEdit, onDelete }: CardProps) => {
           boxShadow: 'inset 0 -2px 4px rgba(0,0,0,0.15)',
         }}
       >
-        <Typography variant="subtitle1" sx={{ userSelect: 'none', fontWeight: 600 }}>
+        <Typography
+          variant="subtitle1"
+          sx={{ userSelect: 'none', fontWeight: 600 }}
+        >
           {task.title}
         </Typography>
+
         <Box>
           <IconButton
             size="small"
@@ -68,34 +78,44 @@ const Card = ({ task, onEdit, onDelete }: CardProps) => {
               e.stopPropagation();
               onEdit(task);
             }}
-            aria-label="editar tarefa"
-            color="inherit"
+            aria-label="Editar tarefa"
             sx={{ color: 'rgba(255,255,255,0.9)' }}
           >
             <EditIcon fontSize="small" />
           </IconButton>
+
           <IconButton
             size="small"
             onClick={(e) => {
               e.stopPropagation();
               onDelete(task.id);
             }}
-            aria-label="excluir tarefa"
-            color="inherit"
+            aria-label="Excluir tarefa"
             sx={{ color: 'rgba(255,255,255,0.9)' }}
           >
             <DeleteIcon fontSize="small" />
           </IconButton>
-          <DragIndicatorIcon
-            fontSize="small"
-            sx={{ ml: 1, cursor: 'grab', color: 'rgba(255,255,255,0.9)' }}
-            aria-label="arrastar tarefa"
-          />
+
+          {/* Drag handle */}
+          <IconButton
+            size="small"
+            {...attributes}
+            {...listeners}
+            aria-label="Arrastar tarefa"
+            sx={{
+              ml: 1,
+              cursor: 'grab',
+              color: 'rgba(255,255,255,0.9)',
+              p: 0.5,
+            }}
+          >
+            <DragIndicatorIcon fontSize="small" aria-hidden="true" />
+          </IconButton>
         </Box>
       </Box>
 
       {task.description && (
-        <Box sx={{ padding: '12px 16px', color: 'text.secondary' }}>
+        <Box sx={{ p: 2, color: 'text.secondary' }}>
           <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
             {task.description}
           </Typography>
