@@ -1,17 +1,4 @@
 import { useState, useEffect } from 'react';
-import type { DragEndEvent } from '@dnd-kit/core';
-import {
-  DndContext,
-  closestCenter,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core';
-import {
-  arrayMove,
-  SortableContext,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
 import { Box, Button, Typography } from '@mui/material';
 import { Dashboard } from '@mui/icons-material';
 import Column from '../Column/Column';
@@ -27,7 +14,7 @@ const Board = () => {
   const [openForm, setOpenForm] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
 
-  const [itemsByStatus, setItemsByStatus] = useState(() => {
+  const [itemsByStatus, setItemsByStatus] = useState<Record<Task['status'], string[]>>(() => {
     const map = {} as Record<Task['status'], string[]>;
     statuses.forEach((status) => {
       map[status] = tasks
@@ -65,65 +52,6 @@ const Board = () => {
     };
   }, [openForm]);
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: { distance: 5 },
-    }),
-  );
-
-  const onDragEnd = async (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (!over) return;
-
-    const activeId = active.id as string;
-    const overId = over.id as string;
-
-    const activeContainer = active.data?.current?.sortable?.containerId as Task['status'] | undefined;
-    const overContainer = over.data?.current?.sortable?.containerId as Task['status'] | undefined;
-
-    if (!activeContainer || !overContainer) return;
-
-    if (activeContainer === overContainer) {
-      if (activeId !== overId) {
-        setItemsByStatus((prev) => {
-          const oldIndex = prev[activeContainer].indexOf(activeId);
-          const newIndex = prev[overContainer].indexOf(overId);
-
-          return {
-            ...prev,
-            [activeContainer]: arrayMove(prev[activeContainer], oldIndex, newIndex),
-          };
-        });
-      }
-    } else {
-      setItemsByStatus((prev) => {
-        const oldItems = [...prev[activeContainer]];
-        const newItems = [...prev[overContainer]];
-
-        const oldIndex = oldItems.indexOf(activeId);
-        if (oldIndex > -1) oldItems.splice(oldIndex, 1);
-
-        newItems.push(activeId);
-
-        return {
-          ...prev,
-          [activeContainer]: oldItems,
-          [overContainer]: newItems,
-        };
-      });
-
-      try {
-        await updateTask({
-          ...(tasks.find((t) => t.id === activeId) as Task),
-          status: overContainer,
-        });
-      } catch (error) {
-        console.error('Erro ao atualizar tarefa:', error);
-        // opcional: reverter estado ou alertar usuário
-      }
-    }
-  };
-
   const handleEdit = (task: Task) => {
     setTaskToEdit(task);
     setOpenForm(true);
@@ -131,6 +59,34 @@ const Board = () => {
 
   const handleDelete = (id: string) => {
     deleteTask(id);
+  };
+
+  // Avançar status
+  const handleAdvanceTask = async (task: Task) => {
+    const currentIndex = statuses.indexOf(task.status);
+    if (currentIndex === -1 || currentIndex === statuses.length - 1) {
+      return; // já está no último status ou inválido
+    }
+    const newStatus = statuses[currentIndex + 1];
+    try {
+      await updateTask({ ...task, status: newStatus });
+    } catch (error) {
+      console.error('Erro ao avançar tarefa:', error);
+    }
+  };
+
+  // Retornar status
+  const handleReturnTask = async (task: Task) => {
+    const currentIndex = statuses.indexOf(task.status);
+    if (currentIndex <= 0) {
+      return; // já está no primeiro status ou inválido
+    }
+    const newStatus = statuses[currentIndex - 1];
+    try {
+      await updateTask({ ...task, status: newStatus });
+    } catch (error) {
+      console.error('Erro ao retornar tarefa:', error);
+    }
   };
 
   return (
@@ -161,33 +117,28 @@ const Board = () => {
         </Button>
       </Box>
 
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
-        <Box
-          sx={{
-            display: 'flex',
-            gap: 2,
-            flexWrap: 'wrap',
-            justifyContent: 'center',
-          }}
-        >
-          {statuses.map((status) => (
-            <SortableContext
-              key={status}
-              items={itemsByStatus[status]}
-              strategy={verticalListSortingStrategy}
-            >
-              <Column
-                status={status}
-                tasks={itemsByStatus[status].map(
-                  (id) => tasks.find((task) => task.id === id) as Task,
-                )}
-                onEditTask={handleEdit}
-                onDeleteTask={handleDelete}
-              />
-            </SortableContext>
-          ))}
-        </Box>
-      </DndContext>
+      <Box
+        sx={{
+          display: 'flex',
+          gap: 2,
+          flexWrap: 'wrap',
+          justifyContent: 'center',
+        }}
+      >
+        {statuses.map((status) => (
+          <Column
+            key={status}
+            status={status}
+            tasks={itemsByStatus[status]
+              .map((id) => tasks.find((task) => task.id === id))
+              .filter(Boolean) as Task[]}
+            onEditTask={handleEdit}
+            onDeleteTask={handleDelete}
+            onAdvanceTask={handleAdvanceTask}
+            onReturnTask={handleReturnTask} 
+          />
+        ))}
+      </Box>
 
       <TaskForm
         open={openForm}

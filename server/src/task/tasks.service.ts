@@ -18,20 +18,43 @@ export class TasksService {
 
   async findAll() {
     try {
-      return await this.taskRepository.find({ relations: ['column'] });
+      return await this.taskRepository.find({
+        relations: ['column'],
+        order: {
+          columnId: 'ASC',
+          order: 'ASC',
+        },
+      });
     } catch (error) {
       console.error('Erro ao buscar tasks:', error);
       throw new InternalServerErrorException('Erro ao buscar tasks');
     }
   }
 
-  create(createTaskDto: CreateTaskDto) {
-    const task = this.taskRepository.create(createTaskDto);
+  async create(createTaskDto: CreateTaskDto) {
+    const { columnId } = createTaskDto;
+
+    // Busca a última posição (maior order) na coluna
+    const lastTask = await this.taskRepository.findOne({
+      where: { columnId },
+      order: { order: 'DESC' },
+    });
+
+    const order = lastTask ? lastTask.order + 1 : 0;
+
+    const task = this.taskRepository.create({
+      ...createTaskDto,
+      order,
+    });
+
     return this.taskRepository.save(task);
   }
 
   async update(id: number, updateTaskDto: UpdateTaskDto) {
-    const task = await this.taskRepository.findOne({ where: { id }, relations: ['column'] });
+    const task = await this.taskRepository.findOne({
+      where: { id },
+      relations: ['column'],
+    });
 
     if (!task) {
       throw new NotFoundException('Task not found');
@@ -40,15 +63,23 @@ export class TasksService {
     // Atualiza os campos recebidos
     Object.assign(task, updateTaskDto);
 
-    // Se o DTO incluir columnId, atualiza a coluna
-    if (updateTaskDto.columnId) {
-      const column = await this.columnsRepository.findOne({
+    // Atualiza coluna se necessário
+    if (updateTaskDto.columnId && updateTaskDto.columnId !== task.columnId) {
+      const newColumn = await this.columnsRepository.findOne({
         where: { id: updateTaskDto.columnId },
       });
-      if (!column) {
+
+      if (!newColumn) {
         throw new NotFoundException('Column not found');
       }
-      task.column = column;
+
+      task.column = newColumn;
+      task.columnId = newColumn.id;
+    }
+
+    // Atualiza order se passado explicitamente (drag-and-drop)
+    if (typeof updateTaskDto.order === 'number') {
+      task.order = updateTaskDto.order;
     }
 
     return this.taskRepository.save(task);

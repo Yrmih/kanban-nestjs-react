@@ -10,6 +10,8 @@ interface ColumnProps {
   tasks: Task[];
   onEditTask: (task: Task) => void;
   onDeleteTask: (id: string) => void;
+  onAdvanceTask: (task: Task) => Promise<void>;
+  onReturnTask: (task: Task) => Promise<void>;  // NOVO PROP
 }
 
 const statusLabels: Record<Task['status'], string> = {
@@ -19,11 +21,11 @@ const statusLabels: Record<Task['status'], string> = {
   done: 'Concluído',
 };
 
-const Column = ({ status, tasks, onEditTask, onDeleteTask }: ColumnProps) => {
+const Column = ({ status, tasks, onEditTask, onDeleteTask, onAdvanceTask, onReturnTask }: ColumnProps) => {
   const { isOver, setNodeRef } = useDroppable({ id: status });
 
-  const validTasks = React.useMemo(() =>
-    tasks.filter((task): task is Task => task !== undefined && task !== null),
+  const validTasks = React.useMemo(
+    () => tasks.filter((task): task is Task => task !== undefined && task !== null),
     [tasks]
   );
 
@@ -82,6 +84,8 @@ const Column = ({ status, tasks, onEditTask, onDeleteTask }: ColumnProps) => {
               task={task}
               onEdit={onEditTask}
               onDelete={onDeleteTask}
+              onAdvance={onAdvanceTask}
+              onReturn={onReturnTask}
             />
           ))
         )}

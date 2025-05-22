@@ -17,6 +17,10 @@ export class UpdateTaskDto {
   @IsOptional()
   @IsInt()
   columnId?: number;
+
+  @IsOptional()
+  @IsInt()
+  order?: number; // adicionado campo order opcional
 }
 
 /**

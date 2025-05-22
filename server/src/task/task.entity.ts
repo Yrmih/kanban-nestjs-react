@@ -38,4 +38,7 @@ export class Task {
   @ManyToOne(() => Columns, (column) => column.tasks)
   @JoinColumn({ name: 'columnId' })
   column: Columns;
+
+  @ORMColumn()
+  order: number; //Adiciona esse campo para ordenar as tasks
 }

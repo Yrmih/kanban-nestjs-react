@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -8,20 +8,19 @@ import {
   TextField,
   MenuItem,
 } from '@mui/material';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
 import { useTasks } from '../context/TaskContext';
 import type { Task } from '../context/TaskContext';
+// import { getColumns } from '../services/taskService'; // 
 
-import { getColumns } from '../services/taskService';
-
-// Validação do formulário (incluindo status e columnId)
+// Validação do formulário
 const schema = z.object({
   title: z.string().min(1, 'Título obrigatório'),
   description: z.string().optional(),
-  columnId: z.number(),
+  columnId: z.number(), // Pode manter se necessário no backend
   status: z.enum(['pending', 'in_progress', 'testing', 'done']),
 });
 
@@ -33,18 +32,20 @@ interface TaskFormProps {
   taskToEdit: Task | null;
 }
 
-interface Column {
-  id: number;
-  title: string;
-}
+// interface Column {
+//   id: number;
+//   title: string;
+// }
 
 const TaskForm = ({ open, onClose, taskToEdit }: TaskFormProps) => {
   const { addTask, updateTask } = useTasks();
-  const [columns, setColumns] = useState<Column[]>([]);
+
+  // const [columns, setColumns] = useState<Column[]>([]); // 
 
   const {
     register,
     handleSubmit,
+    control,
     reset,
     formState: { errors },
   } = useForm<FormData>({
@@ -52,26 +53,24 @@ const TaskForm = ({ open, onClose, taskToEdit }: TaskFormProps) => {
     defaultValues: {
       title: '',
       description: '',
-      columnId: 1,    // default para a primeira coluna
-      status: 'pending', // default para status
+      columnId: 1,
+      status: 'pending',
     },
   });
+  // deixei comentado para futuramente poder evoluir e melhor o sistema. 
+  // useEffect(() => {
+  //   const fetchColumns = async () => {
+  //     try {
+  //       const cols = await getColumns();
+  //       setColumns(cols);
+  //     } catch (err) {
+  //       console.error('Erro ao buscar colunas', err);
+  //     }
+  //   };
 
-  // Busca colunas do backend quando o modal abre
-  useEffect(() => {
-    const fetchColumns = async () => {
-      try {
-        const cols = await getColumns();
-        setColumns(cols);
-      } catch (err) {
-        console.error('Erro ao buscar colunas', err);
-      }
-    };
+  //   if (open) fetchColumns();
+  // }, [open]);
 
-    if (open) fetchColumns();
-  }, [open]);
-
-  // Se estiver editando, preencher formulário com dados da tarefa
   useEffect(() => {
     if (taskToEdit) {
       reset({
@@ -90,7 +89,6 @@ const TaskForm = ({ open, onClose, taskToEdit }: TaskFormProps) => {
     }
   }, [taskToEdit, reset]);
 
-  // Enviar formulário: chama addTask ou updateTask com todos os dados necessários
   const onSubmit = async (data: FormData) => {
     if (taskToEdit) {
       await updateTask({ ...taskToEdit, ...data });
@@ -101,7 +99,6 @@ const TaskForm = ({ open, onClose, taskToEdit }: TaskFormProps) => {
     onClose();
   };
 
-  // Fecha o modal e reseta o form
   const handleClose = () => {
     reset();
     onClose();
@@ -129,36 +126,50 @@ const TaskForm = ({ open, onClose, taskToEdit }: TaskFormProps) => {
             fullWidth
           />
 
-          {/* Select dinâmico para colunas */}
-          <TextField
-            select
-            label="Coluna"
-            {...register('columnId', { valueAsNumber: true })}
-            fullWidth
-            error={!!errors.columnId}
-            helperText={errors.columnId?.message}
-          >
-            {columns.map((col) => (
-              <MenuItem key={col.id} value={col.id}>
-                {col.title}
-              </MenuItem>
-            ))}
-          </TextField>
+          {/* Coluna desabilitada temporariamente */}
+          {/* 
+          <Controller
+            name="columnId"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                select
+                label="Coluna"
+                fullWidth
+                error={!!errors.columnId}
+                helperText={errors.columnId?.message}
+                {...field}
+              >
+                {columns.map((col) => (
+                  <MenuItem key={col.id} value={col.id}>
+                    {col.title}
+                  </MenuItem>
+                ))}
+              </TextField>
+            )}
+          />
+          */}
 
-          {/* Select para status da tarefa */}
-          <TextField
-            select
-            label="Status"
-            {...register('status')}
-            fullWidth
-            error={!!errors.status}
-            helperText={errors.status?.message}
-          >
-            <MenuItem value="pending">Pendente</MenuItem>
-            <MenuItem value="in_progress">Em progresso</MenuItem>
-            <MenuItem value="testing">Testando</MenuItem>
-            <MenuItem value="done">Concluído</MenuItem>
-          </TextField>
+          {/* Status */}
+          <Controller
+            name="status"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                select
+                label="Status"
+                fullWidth
+                error={!!errors.status}
+                helperText={errors.status?.message}
+                {...field}
+              >
+                <MenuItem value="pending">Pendente</MenuItem>
+                <MenuItem value="in_progress">Em progresso</MenuItem>
+                <MenuItem value="testing">Testando</MenuItem>
+                <MenuItem value="done">Concluído</MenuItem>
+              </TextField>
+            )}
+          />
         </DialogContent>
 
         <DialogActions>
