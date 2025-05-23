@@ -1,5 +1,5 @@
-import { IsOptional, IsString, IsEnum, IsInt } from 'class-validator';
-import { TaskStatus } from '../task.entity'; // importa o enum
+import { IsOptional, IsString, IsEnum, IsInt, IsBoolean } from 'class-validator';
+import { TaskStatus } from '../task.entity';
 
 export class UpdateTaskDto {
   @IsOptional()
@@ -20,7 +20,11 @@ export class UpdateTaskDto {
 
   @IsOptional()
   @IsInt()
-  order?: number; // adicionado campo order opcional
+  order?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  isPinned?: boolean;
 }
 
 /**

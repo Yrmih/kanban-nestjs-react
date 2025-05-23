@@ -5,6 +5,7 @@ import Column from '../Column/Column';
 import TaskForm from '../TaskForm';
 import { useTasks } from '../../context/TaskContext';
 import type { Task } from '../../context/TaskContext';
+import { togglePinTask } from '../../services/taskService';  // ajuste o caminho conforme seu projeto
 
 const statuses = ['pending', 'in_progress', 'testing', 'done'] as const;
 
@@ -14,22 +15,30 @@ const Board = () => {
   const [openForm, setOpenForm] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
 
-  const [itemsByStatus, setItemsByStatus] = useState<Record<Task['status'], string[]>>(() => {
-    const map = {} as Record<Task['status'], string[]>;
+  const [itemsByStatus, setItemsByStatus] = useState<Record<Task['status'], Task[]>>(() => {
+    const map = {} as Record<Task['status'], Task[]>;
     statuses.forEach((status) => {
       map[status] = tasks
         .filter((task) => task.status === status)
-        .map((task) => task.id);
+        .sort((a, b) => {
+          if (a.isPinned && !b.isPinned) return -1;
+          if (!a.isPinned && b.isPinned) return 1;
+          return 0;
+        });
     });
     return map;
   });
 
   useEffect(() => {
-    const map = {} as Record<Task['status'], string[]>;
+    const map = {} as Record<Task['status'], Task[]>;
     statuses.forEach((status) => {
       map[status] = tasks
         .filter((task) => task.status === status)
-        .map((task) => task.id);
+        .sort((a, b) => {
+          if (a.isPinned && !b.isPinned) return -1;
+          if (!a.isPinned && b.isPinned) return 1;
+          return 0;
+        });
     });
     setItemsByStatus(map);
   }, [tasks]);
@@ -89,6 +98,17 @@ const Board = () => {
     }
   };
 
+  // Alternar fixar/desfixar task
+  const handleTogglePinTask = async (task: Task) => {
+  try {
+    const updatedTask = { ...task, isPinned: !task.isPinned };
+    await updateTask(updatedTask); // isso atualiza backend + contexto local
+  } catch (error) {
+    console.error('Erro ao fixar/desfixar tarefa:', error);
+  }
+};
+
+
   return (
     <>
       <Box
@@ -129,13 +149,12 @@ const Board = () => {
           <Column
             key={status}
             status={status}
-            tasks={itemsByStatus[status]
-              .map((id) => tasks.find((task) => task.id === id))
-              .filter(Boolean) as Task[]}
+            tasks={itemsByStatus[status]}
             onEditTask={handleEdit}
             onDeleteTask={handleDelete}
             onAdvanceTask={handleAdvanceTask}
-            onReturnTask={handleReturnTask} 
+            onReturnTask={handleReturnTask}
+            onTogglePin={handleTogglePinTask} // novo handler para fixar task
           />
         ))}
       </Box>

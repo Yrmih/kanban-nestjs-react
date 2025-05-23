@@ -11,7 +11,8 @@ interface ColumnProps {
   onEditTask: (task: Task) => void;
   onDeleteTask: (id: string) => void;
   onAdvanceTask: (task: Task) => Promise<void>;
-  onReturnTask: (task: Task) => Promise<void>;  // NOVO PROP
+  onReturnTask: (task: Task) => Promise<void>;
+  onTogglePin: (task: Task) => void;  // nova prop
 }
 
 const statusLabels: Record<Task['status'], string> = {
@@ -21,7 +22,15 @@ const statusLabels: Record<Task['status'], string> = {
   done: 'Concluído',
 };
 
-const Column = ({ status, tasks, onEditTask, onDeleteTask, onAdvanceTask, onReturnTask }: ColumnProps) => {
+const Column = ({
+  status,
+  tasks,
+  onEditTask,
+  onDeleteTask,
+  onAdvanceTask,
+  onReturnTask,
+  onTogglePin,  // novo
+}: ColumnProps) => {
   const { isOver, setNodeRef } = useDroppable({ id: status });
 
   const validTasks = React.useMemo(
@@ -86,6 +95,7 @@ const Column = ({ status, tasks, onEditTask, onDeleteTask, onAdvanceTask, onRetu
               onDelete={onDeleteTask}
               onAdvance={onAdvanceTask}
               onReturn={onReturnTask}
+              onTogglePin={onTogglePin}  // passando para o Card
             />
           ))
         )}

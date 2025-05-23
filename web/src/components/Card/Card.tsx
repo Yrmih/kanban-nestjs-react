@@ -1,10 +1,16 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Box, IconButton, Typography } from '@mui/material';
+import {
+  Box,
+  IconButton,
+  Typography,
+  Tooltip
+} from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import PushPinIcon from '@mui/icons-material/PushPin';
 
 import type { Task } from '../../context/TaskContext';
 
@@ -14,6 +20,7 @@ interface CardProps {
   onDelete: (id: string) => void;
   onAdvance?: (task: Task) => void;
   onReturn?: (task: Task) => void;
+  onTogglePin: (task: Task) => void;
 }
 
 const headerColors: Record<Task['status'], string> = {
@@ -23,7 +30,14 @@ const headerColors: Record<Task['status'], string> = {
   done: '#4caf50',
 };
 
-const Card = ({ task, onEdit, onDelete, onAdvance, onReturn }: CardProps) => {
+const Card = ({
+  task,
+  onEdit,
+  onDelete,
+  onAdvance,
+  onReturn,
+  onTogglePin,
+}: CardProps) => {
   const {
     attributes,
     listeners,
@@ -38,7 +52,7 @@ const Card = ({ task, onEdit, onDelete, onAdvance, onReturn }: CardProps) => {
   };
 
   const canAdvance = task.status !== 'done';
-  const canReturn = task.status !== 'pending'; // não pode retornar se estiver no primeiro status
+  const canReturn = task.status !== 'pending';
 
   return (
     <Box
@@ -55,6 +69,7 @@ const Card = ({ task, onEdit, onDelete, onAdvance, onReturn }: CardProps) => {
         display: 'flex',
         flexDirection: 'column',
         cursor: 'grab',
+        border: task.isPinned ? '2px solid #FFC107' : 'none', // Borda amarelo ouro para fixado
         ...style,
       }}
     >
@@ -73,12 +88,45 @@ const Card = ({ task, onEdit, onDelete, onAdvance, onReturn }: CardProps) => {
           userSelect: 'none',
         }}
       >
-        <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-          {task.title}
-        </Typography>
+        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+            {task.title}
+          </Typography>
+
+          {task.isPinned && (
+            <Typography
+              variant="caption"
+              sx={{
+                color: '#FFC107',
+                fontWeight: 500,
+                mt: 0.2,
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+              }}
+            >
+              Fixada
+            </Typography>
+          )}
+        </Box>
 
         <Box>
-          {/* Botão para retornar */}
+          <Tooltip title={task.isPinned ? 'Desafixar' : 'Fixar'}>
+            <IconButton
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                onTogglePin(task);
+              }}
+              aria-label={task.isPinned ? 'Desafixar tarefa' : 'Fixar tarefa'}
+              sx={{
+                color: task.isPinned ? '#FFC107' : '#FFF',
+                mr: 1,
+              }}
+            >
+              <PushPinIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+
           {canReturn && onReturn && (
             <IconButton
               size="small"
@@ -93,7 +141,6 @@ const Card = ({ task, onEdit, onDelete, onAdvance, onReturn }: CardProps) => {
             </IconButton>
           )}
 
-          {/* Botão para avançar */}
           {canAdvance && onAdvance && (
             <IconButton
               size="small"
@@ -102,7 +149,7 @@ const Card = ({ task, onEdit, onDelete, onAdvance, onReturn }: CardProps) => {
                 onAdvance(task);
               }}
               aria-label="Avançar tarefa"
-              sx={{ color: 'rgba(255,255,255,0.9)' }}
+              sx={{ color: 'rgba(255,255,255,0.9)', mr: 1 }}
             >
               <ArrowForwardIcon fontSize="small" />
             </IconButton>
@@ -115,7 +162,7 @@ const Card = ({ task, onEdit, onDelete, onAdvance, onReturn }: CardProps) => {
               onEdit(task);
             }}
             aria-label="Editar tarefa"
-            sx={{ color: 'rgba(255,255,255,0.9)' }}
+            sx={{ color: 'rgba(255,255,255,0.9)', mr: 1 }}
           >
             <EditIcon fontSize="small" />
           </IconButton>

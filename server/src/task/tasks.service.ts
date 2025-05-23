@@ -22,7 +22,8 @@ export class TasksService {
         relations: ['column'],
         order: {
           columnId: 'ASC',
-          order: 'ASC',
+          isPinned: 'DESC', // Tarefas fixadas aparecem primeiro
+          order: 'ASC', // Depois, pelo campo de ordenação
         },
       });
     } catch (error) {
@@ -32,7 +33,7 @@ export class TasksService {
   }
 
   async create(createTaskDto: CreateTaskDto) {
-    const { columnId } = createTaskDto;
+    const { columnId, isPinned } = createTaskDto;
 
     // Busca a última posição (maior order) na coluna
     const lastTask = await this.taskRepository.findOne({
@@ -44,6 +45,7 @@ export class TasksService {
 
     const task = this.taskRepository.create({
       ...createTaskDto,
+      isPinned: isPinned ?? false,
       order,
     });
 
@@ -80,6 +82,11 @@ export class TasksService {
     // Atualiza order se passado explicitamente (drag-and-drop)
     if (typeof updateTaskDto.order === 'number') {
       task.order = updateTaskDto.order;
+    }
+
+    // Atualiza is_pinned se passado
+    if (typeof updateTaskDto.isPinned === 'boolean') {
+      task.isPinned = updateTaskDto.isPinned;
     }
 
     return this.taskRepository.save(task);

@@ -10,7 +10,8 @@ export interface Task {
   title: string;
   description?: string;
   status: TaskStatus;
-  columnId: number; 
+  columnId: number;
+  isPinned: boolean;  // adicionada a propriedade pinned
 }
 
 interface TaskContextType {
@@ -29,14 +30,17 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
   const fetchTasks = async () => {
     try {
       const data = await taskService.getTasks();
-      // Mapear incluindo columnId e status
-      setTasks(data.map(({ id, title, description, status, columnId }) => ({
-        id,
-        title,
-        description,
-        status,
-        columnId,
-      })));
+      // Mapear incluindo pinned
+      setTasks(
+        data.map(({ id, title, description, status, columnId, isPinned }) => ({
+          id,
+          title,
+          description,
+          status,
+          columnId,
+          isPinned: isPinned ?? false, // padrão false se undefined
+        }))
+      );
     } catch (error) {
       console.error('fetchTasks:', error);
       toast.error('Erro ao carregar tarefas');
@@ -46,13 +50,17 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
   const addTask = async (task: Omit<Task, 'id'>) => {
     try {
       const newTask = await taskService.createTask(task);
-      setTasks(prev => [...prev, {
-        id: newTask.id,
-        title: newTask.title,
-        description: newTask.description,
-        status: newTask.status,
-        columnId: newTask.columnId,
-      }]);
+      setTasks(prev => [
+        ...prev,
+        {
+          id: newTask.id,
+          title: newTask.title,
+          description: newTask.description,
+          status: newTask.status,
+          columnId: newTask.columnId,
+          isPinned: newTask.isPinned ?? false,
+        },
+      ]);
       toast.success('Tarefa adicionada com sucesso!');
     } catch (error) {
       console.error('addTask:', error);
@@ -72,6 +80,7 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
                 description: updatedTask.description,
                 status: updatedTask.status,
                 columnId: updatedTask.columnId,
+                isPinned: updatedTask.isPinned ?? false,
               }
             : t
         )

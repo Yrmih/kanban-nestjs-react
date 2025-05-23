@@ -40,5 +40,8 @@ export class Task {
   column: Columns;
 
   @ORMColumn()
-  order: number; //Adiciona esse campo para ordenar as tasks
+  order: number; // Adicionei esse campo para ordenar as tasks
+
+  @ORMColumn({ type: 'boolean', default: false })
+  isPinned: boolean; // Nova coluna para tarefas fixadas
 }
